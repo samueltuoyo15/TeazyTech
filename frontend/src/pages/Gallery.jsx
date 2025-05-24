@@ -7,7 +7,6 @@ import galleryData from "../lib/galleryData";
 const Gallery = () => {
     const [activeFilter, setActiveFilter] = useState("all");
     const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [currentImage, setCurrentImage] = useState(null);
     const [selectedItem, setSelectedItem] = useState({
         id: "",
         title: "",
@@ -79,12 +78,6 @@ const Gallery = () => {
             ? galleryData
             : galleryData.filter((item) => item.category === activeFilter);
 
-    const openLightbox = (item) => {
-        setCurrentImage(item);
-        setLightboxOpen(true);
-        document.body.style.overflow = "hidden";
-    };
-
     const closeLightbox = () => {
         setLightboxOpen(false);
         setIndex(0);
@@ -92,20 +85,6 @@ const Gallery = () => {
     };
 
     const navigateLightbox = (direction) => {
-        /* const currentIndex = galleryItems.findIndex(
-            (item) => item.id === currentImage.id
-        );
-        let newIndex;
-
-        if (direction === "next") {
-            newIndex = (currentIndex + 1) % galleryItems.length;
-        } else {
-            newIndex =
-                (currentIndex - 1 + galleryItems.length) % galleryItems.length;
-        }
-
-        setCurrentImage(galleryItems[newIndex]);*/
-
         if (direction === "next") {
             setIndex((index + 1) % selectedItem.images.length);
         } else {
@@ -114,7 +93,6 @@ const Gallery = () => {
     };
 
     const handleClickOnItem = (item) => {
-        //openLightbox(item);
         setLightboxOpen(true);
         setSelectedItem({
             id: item.id,
