@@ -64,24 +64,25 @@ const TestimonialsSection = () => {
                         >
                             <div className="testimonial-alt-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
-                                    alt="Sarah Johnson"
+                                    src="/images/Teazy tech teachers/Amos happiness.jpg"
+                                    alt="Amos Happiness"
                                 />
                             </div>
                             <div className="testimonial-alt-content">
-                                <h3>Sarah Johnson</h3>
+                                <h3>Amos Happiness</h3>
                                 <p className="testimonial-alt-position">
-                                    High School Science Teacher
+                                    Teacher(Educator)
                                 </p>
                                 <div className="testimonial-alt-text">
                                     <p>
-                                        "Teazy Tech's workshops completely
-                                        changed how I approach technology in my
-                                        classroom. My students are more engaged
-                                        than ever, and I feel confident using
-                                        new digital tools. The training was
-                                        practical and immediately applicable to
-                                        my curriculum."
+                                        "Joining the Teazy Tech platform has
+                                        been so helpful because I always receive
+                                        updates on educational apps I really
+                                        need, which helps me improve my teaching
+                                        methods in terms of organizing my
+                                        lessons, engaging in quizzes, and
+                                        creating beautiful teaching aids. I now
+                                        feel much bolder as an educator."
                                     </p>
                                 </div>
                             </div>
@@ -92,26 +93,34 @@ const TestimonialsSection = () => {
                             ref={(el) => addToRefs(el, 1)}
                         >
                             <div className="testimonial-alt-content">
-                                <h3>Michael Rodriguez</h3>
+                                <h3>Amoatey Benjamin</h3>
                                 <p className="testimonial-alt-position">
-                                    Elementary School Teacher
+                                    Ghanian Teacher
                                 </p>
                                 <div className="testimonial-alt-text">
-                                    <p>
-                                        "As someone who was intimidated by
-                                        technology, Teazy Tech provided the
-                                        perfect step-by-step guidance I needed.
-                                        Now I'm creating digital lessons my
-                                        students love! The personalized support
-                                        made all the difference in my confidence
-                                        level."
+                                    <p className="line-clamp-5">
+                                        "Hi I am Mr. Amoatey Benjamin. A
+                                        professional teacher with Ghana
+                                        Education Service. My love for
+                                        Professional Development led me to Teazy
+                                        Tech Community, online in August 2024. I
+                                        have received so much essential teaching
+                                        resources from the community in the form
+                                        of pictures, videos, facebook posts,
+                                        ebooks and short courses.One Ebook
+                                        dubbed Becoming a Tech Savvy, is one
+                                        resource that has increased my joy for
+                                        joining the Teazy Tech Community. All
+                                        these resources have made teaching &
+                                        learning outcomes so fruitful and
+                                        positive. Thanks to TEAZY TECH. "
                                     </p>
                                 </div>
                             </div>
                             <div className="testimonial-alt-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80"
-                                    alt="Michael Rodriguez"
+                                    src="/images/Teazy tech teachers/amoatey Benjamin.jpg"
+                                    alt="Amoatey Benjamin"
                                 />
                             </div>
                         </div>

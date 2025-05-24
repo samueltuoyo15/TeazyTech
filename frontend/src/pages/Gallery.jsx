@@ -191,7 +191,7 @@ const Gallery = () => {
                                                     </div>
                                                     <div className="gallery-item-overlay">
                                                         <h3>{item.title}</h3>
-                                                        <p>
+                                                        <p className="line-clamp-2">
                                                             {item.description}
                                                         </p>
                                                         <div className="gallery-item-category">
@@ -239,7 +239,7 @@ const Gallery = () => {
                                                     </div>
                                                     <div className="gallery-item-overlay">
                                                         <h3>{item.title}</h3>
-                                                        <p>
+                                                        <p className="line-clamp-2">
                                                             {item.description}
                                                         </p>
                                                         <div className="gallery-item-category">
@@ -286,7 +286,7 @@ const Gallery = () => {
                                                     </div>
                                                     <div className="gallery-item-overlay">
                                                         <h3>{item.title}</h3>
-                                                        <p>
+                                                        <p className="line-clamp-2">
                                                             {item.description}
                                                         </p>
                                                         <div className="gallery-item-category">
@@ -333,7 +333,7 @@ const Gallery = () => {
                                                     </div>
                                                     <div className="gallery-item-overlay">
                                                         <h3>{item.title}</h3>
-                                                        <p>
+                                                        <p className="line-clamp-2">
                                                             {item.description}
                                                         </p>
                                                         <div className="gallery-item-category">
@@ -370,7 +370,9 @@ const Gallery = () => {
                                     </div>
                                     <div className="gallery-item-overlay">
                                         <h3>{item.title}</h3>
-                                        <p>{item.description}</p>
+                                        <p className="line-clamp-2">
+                                            {item.description}
+                                        </p>
                                         <div className="gallery-item-category">
                                             {
                                                 filters.find(
@@ -428,21 +430,27 @@ const Gallery = () => {
                                 {selectedItem.category}
                             </div>
                         </div>
-                        {selectedItem.category === "events" && (
+                        {selectedItem.category === "events" ||
+                        selectedItem.category === "workshops" ? (
                             <button
                                 className="lightbox-nav lightbox-prev"
                                 onClick={() => navigateLightbox("prev")}
                             >
                                 <i className="fas fa-chevron-left"></i>
                             </button>
+                        ) : (
+                            ""
                         )}
-                        {selectedItem.category === "events" && (
+                        {selectedItem.category === "events" ||
+                        selectedItem.category === "workshops" ? (
                             <button
                                 className="lightbox-nav lightbox-next"
                                 onClick={() => navigateLightbox("next")}
                             >
                                 <i className="fas fa-chevron-right"></i>
                             </button>
+                        ) : (
+                            ""
                         )}
                     </div>
                 </div>

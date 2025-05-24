@@ -53,7 +53,7 @@ const About = () => {
                     <div className="our-story-content">
                         <div className="our-story-image">
                             <img
-                                src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                src="/images/workshopPhotos/IMG_8138.jpg"
                                 alt="Teazy Tech founders"
                             />
                         </div>
@@ -199,7 +199,7 @@ const About = () => {
                         <div className="team-member">
                             <div className="team-member-image">
                                 <img
-                                    src="/images/unknownGroupPhoto1/IMG_8138.jpg"
+                                    src="/images/workshopPhotos/IMG_8138.jpg"
                                     alt="Team member"
                                 />
                             </div>
@@ -269,17 +269,43 @@ const About = () => {
                         <div className="team-member">
                             <div className="team-member-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    src="/images/Teazy Tech Volunteers/Emmanuel Clement.jpg"
                                     alt="Team member"
                                 />
                             </div>
-                            <h3>David Okafor</h3>
+                            <h3>Emmanuel Clement</h3>
                             <p className="team-member-role">
-                                Professional Development Director
+                                Video Content Creator
                             </p>
                             <p className="team-member-bio">
-                                Experienced trainer specializing in making
-                                technology accessible to all skill levels.
+                                Our professional Video content creator,
+                                versatile with various modern media editing
+                                skills
+                            </p>
+                            <div className="team-member-social">
+                                <a href="#" aria-label="LinkedIn">
+                                    <i className="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" aria-label="Twitter">
+                                    <i className="fab fa-twitter"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="team-member">
+                            <div className="team-member-image">
+                                <img
+                                    src="/images/Teazy Tech Volunteers/Chelsea Julius.jpg"
+                                    alt="Team member"
+                                />
+                            </div>
+                            <h3>Chelsea Julius</h3>
+                            <p className="team-member-role">
+                                Business Assistant and Community Manager
+                            </p>
+                            <p className="team-member-bio">
+                                Chelsea julius is the secondary overseer of the
+                                business aspects of our communities.
                             </p>
                             <div className="team-member-social">
                                 <a href="#" aria-label="LinkedIn">

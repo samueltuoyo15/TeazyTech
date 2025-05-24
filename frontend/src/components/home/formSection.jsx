@@ -29,12 +29,13 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                 //sending four parameters namely: service Id from emailjs, template Id from emailjs,
                 //formdata and emailjs public key/API key
                 try {
-                    const response = await emailjs.send(
+                    /*const response = await emailjs.send(
                         "service_it769k8",
                         "template_h0wx2fl",
                         fields,
                         "TPxhQrfopzurp7Isq"
-                    );
+                    );*/
+
                     console.log("email sent succesfully", response);
                     setShowSuccess(true);
                     setTimeout(() => setShowSuccess(false), 4000);
@@ -129,7 +130,16 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                         Please don&apos;t hesitate to contact us
                     </p>
                     <ul className="mt-6 flex flex-col justify-center gap-y-2">
-                        <li className="flex">sokka1234@gmail.com</li>
+                        <li className="flex gap-x-1.5">
+                            <svg
+                                className="w-5 stroke-indigo-500 fill-indigo-500"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 -960 960 960"
+                            >
+                                <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" />
+                            </svg>
+                            sokka1234@gmail.com
+                        </li>
                         <li className="flex gap-x-1.5">
                             <svg
                                 className="w-4 stroke-indigo-500 fill-indigo-500"
@@ -140,7 +150,16 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                             </svg>
                             +1 (234) 567 890
                         </li>
-                        <li>Lagos State, Nigeria</li>
+                        <li className="flex gap-x-1.5">
+                            <svg
+                                className="fill-indigo-500 stroke-indigo-500 w-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 -960 960 960"
+                            >
+                                <path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z" />
+                            </svg>
+                            Lagos State, Nigeria
+                        </li>
                     </ul>
                 </div>
 

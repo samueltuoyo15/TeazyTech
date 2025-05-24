@@ -291,7 +291,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80"
+                                    src="/images/unknownGroupPhoto1/IMG_7528.jpg"
                                     alt="Strategic Planning"
                                 />
                             </div>
@@ -315,22 +315,23 @@ const Services = () => {
                         <div className="testimonial-card">
                             <div className="testimonial-content">
                                 <p>
-                                    "The professional development workshops from
-                                    Teazy Tech completely transformed how our
-                                    teachers approach technology. The hands-on,
-                                    practical approach meant that everyone left
-                                    with skills they could immediately implement
-                                    in their classrooms."
+                                    "Joining the Teazy Tech platform has been so
+                                    helpful because I always receive updates on
+                                    educational apps I really need, which helps
+                                    me improve my teaching methods in terms of
+                                    organizing my lessons, engaging in quizzes,
+                                    and creating beautiful teaching aids. I now
+                                    feel much bolder as an educator."
                                 </p>
                             </div>
                             <div className="testimonial-author">
                                 <img
-                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-                                    alt="Principal"
+                                    src="/images/Teazy tech teachers/Amos happiness.jpg"
+                                    alt="amos happiness"
                                 />
                                 <div>
-                                    <h4>Dr. Robert Chen</h4>
-                                    <p>Principal, Westlake High School</p>
+                                    <h4>Amos Happiness</h4>
+                                    <p>Teacher(Educator)</p>
                                 </div>
                             </div>
                         </div>
@@ -338,24 +339,25 @@ const Services = () => {
                         <div className="testimonial-card">
                             <div className="testimonial-content">
                                 <p>
-                                    "The strategic planning service helped our
-                                    district make informed decisions about our
-                                    technology investments. The Teazy Tech team
-                                    took the time to understand our unique needs
-                                    and developed a plan that aligned perfectly
-                                    with our educational goals."
+                                    "I am now a Canva 'Guru' in my school thanks
+                                    to Teazy tech training a while back. I'm
+                                    able to develop any resource for my lesson
+                                    that I'm not able to find online myself and
+                                    I'm working on creating my portfolio because
+                                    I'm hoping to sell some of the educational
+                                    resources I've been developing online. I'm
+                                    sure it will be useful to others as well.
+                                    Thanks so very much."
                                 </p>
                             </div>
                             <div className="testimonial-author">
                                 <img
-                                    src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=761&q=80"
+                                    src="/images/Teazy tech teachers/Florence imhande.jpg"
                                     alt="Superintendent"
                                 />
                                 <div>
-                                    <h4>Jennifer Martinez</h4>
-                                    <p>
-                                        Superintendent, Oakridge School District
-                                    </p>
+                                    <h4>FLorence Imhande</h4>
+                                    <p>Teacher</p>
                                 </div>
                             </div>
                         </div>
@@ -363,24 +365,22 @@ const Services = () => {
                         <div className="testimonial-card">
                             <div className="testimonial-content">
                                 <p>
-                                    "As a teacher who was intimidated by
-                                    technology, I found the content creation
-                                    services invaluable. Not only did they
-                                    create amazing digital lessons for my
-                                    science class, but they taught me how to
-                                    make my own going forward."
+                                    "Teazy Tech has really helped me in my
+                                    online teaching. Teazy Tech always sends
+                                    some really amazing EdTech tools like
+                                    Photomath that I never knew existed. The
+                                    community is so engaging, and we're always
+                                    sent resources to ease our work for free."
                                 </p>
                             </div>
                             <div className="testimonial-author">
                                 <img
-                                    src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                                    src="/images/Teazy tech teachers/abimbola adiodun akanbi.jpg"
                                     alt="Teacher"
                                 />
                                 <div>
-                                    <h4>Michael Johnson</h4>
-                                    <p>
-                                        Science Teacher, Riverdale Middle School
-                                    </p>
+                                    <h4>Abimbola Abiodun</h4>
+                                    <p>Maths Teacher</p>
                                 </div>
                             </div>
                         </div>
