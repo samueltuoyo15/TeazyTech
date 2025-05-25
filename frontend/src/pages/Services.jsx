@@ -40,8 +40,8 @@ const Services = () => {
                         </div>
                         <div className="services-overview-image">
                             <img
-                                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-                                alt="Teachers in a workshop"
+                                src="/images/Gallery Kaduna Training/IMG_6147.jpg"
+                                alt="Group photo"
                             />
                         </div>
                     </div>
@@ -110,7 +110,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    src="/images/Gallery Kaduna Training/IMG_5839.jpg"
                                     alt="Professional Development"
                                 />
                             </div>
@@ -170,7 +170,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    src="/images/Gallery Ibadan Training/IMG_7743.jpg"
                                     alt="Technology Integration"
                                 />
                             </div>
@@ -230,7 +230,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    src="/images/Gallery Ibadan Training/IMG_7741.jpg"
                                     alt="Digital Content Creation"
                                 />
                             </div>
@@ -315,23 +315,27 @@ const Services = () => {
                         <div className="testimonial-card">
                             <div className="testimonial-content">
                                 <p>
-                                    "Joining the Teazy Tech platform has been so
-                                    helpful because I always receive updates on
-                                    educational apps I really need, which helps
-                                    me improve my teaching methods in terms of
-                                    organizing my lessons, engaging in quizzes,
-                                    and creating beautiful teaching aids. I now
-                                    feel much bolder as an educator."
+                                    "Teazytech has become a quick go to platform
+                                    for me, the short demos and introduction of
+                                    important edtch tools that I never knew
+                                    existed before now has made my work better
+                                    as an educator. Teazy tech absolutely
+                                    qualifies for every passionate teacher's
+                                    companion. The demos and illustration videos
+                                    are short and easy guides even for teachers
+                                    that have no prior EdTech experience. With
+                                    teazy tech I've come to appreciate that
+                                    EdTech isn't as far fetched as I thought."
                                 </p>
                             </div>
                             <div className="testimonial-author">
                                 <img
-                                    src="/images/Teazy tech teachers/Amos happiness.jpg"
+                                    src="/images/Teazy tech teachers/wua msughve isaac.jpg"
                                     alt="amos happiness"
                                 />
                                 <div>
-                                    <h4>Amos Happiness</h4>
-                                    <p>Teacher(Educator)</p>
+                                    <h4>Wua Msughve Issac</h4>
+                                    <p>Teacher</p>
                                 </div>
                             </div>
                         </div>

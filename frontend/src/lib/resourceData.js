@@ -1,16 +1,5 @@
 const resourceData = [
     {
-        id: "techSavvyTeacher",
-        title: "Become a Tech Savvy Teacher",
-        category: "guides",
-        image: "/images/resourcesFolder/becomingTechSavvyTeacher.png",
-        description:
-            "A comprehensive guide for teachers new to educational technology.",
-        type: "PDF guide",
-        date: "june 15 2023",
-        link: "https://drive.google.com/file/d/1GAFr_OOxWv4s5vI0TrZmhqW9QPph0ZQ1/view?usp=drivesdk",
-    },
-    {
         id: "standoutOnDole",
         title: "Creating a Standout Profile on Dole Lesson",
         category: "guides",
@@ -25,7 +14,7 @@ const resourceData = [
         id: "introductionTODole",
         title: "Introduction to Dole Lesson",
         category: "guides",
-        image: "/images/resourcesFolder/introductiontoDoleLesson.png",
+        image: "/images/resourcesFolder/IntroductiontoDoleLesson.png",
         description:
             "New to Dole lesson? This is your go-to material for your Dole lesson tour.",
         type: "PDF guide",
@@ -72,7 +61,7 @@ const resourceData = [
         image: "/images/resourcesFolder/goodProfileonTutor.png",
         description:
             "This is what you have been missing to create that eye-catching profile with Dole lesson.",
-        type: "Comparison guide",
+        type: "PDF guide",
         date: "jun 15 2023",
         link: "https://drive.google.com/file/d/1CxOH-IBWgHr5H9ZluI2mXiPu7_fyu6fU/view?usp=drivesdk",
     },
@@ -83,7 +72,7 @@ const resourceData = [
         image: "/images/resourcesFolder/outstandingLessonsOnTutorOne.png",
         description:
             "This is what you have been missing to create that eye-catching profile with Dole lesson.",
-        type: "Comparison Guide",
+        type: "PDF Guide",
         date: "sep 20 2023",
         link: "https://drive.google.com/file/d/1DwxWWa1hcxTS2yn5kxXG17cgvwe1RZQP/view?usp=drivesdk",
     },
@@ -105,7 +94,7 @@ const resourceData = [
         image: "/images/resourcesFolder/classdojoTutorial.png",
         description:
             "This is what you have been missing to create that eye-catching profile with Dole lesson.",
-        type: "Comparison Guide",
+        type: "PDF Guide",
         date: "jan 20 2025",
         link: "https://drive.google.com/file/d/15Hsz5T4ct4_0GkjdBI-n56bqMkSDvNDl/view?usp=drivesdk",
     },

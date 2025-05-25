@@ -24,55 +24,6 @@ const Gallery = () => {
         { id: "workshops", name: "Workshops" },
     ];
 
-    /*const galleryItems = [
-        {
-            id: 1,
-            title: "Teacher Workshop in New York",
-            category: "workshops",
-            image: "/images/gallery1.png",
-            description:
-                "Teachers learning about interactive whiteboard technology.",
-        },
-        {
-            id: 2,
-            title: "Annual EdTech Conference",
-            category: "events",
-            image: "/images/gallery2.png",
-            description:
-                "Teazy Tech booth at the 2023 Educational Technology Conference.",
-        },
-        {
-            id: 3,
-            title: "Digital Classroom Implementation",
-            category: "classrooms",
-            image: "/images/gallery3.png",
-            description: "Students engaging with new classroom technology.",
-        },
-        {
-            id: 4,
-            title: "Principal Testimonial Recording",
-            category: "testimonials",
-            image: "/images/gallery4.png",
-            description: "Recording a success story with Westlake High School.",
-        },
-        {
-            id: 5,
-            title: "Hands-on Technology Training",
-            category: "workshops",
-            image: "/images/gallery5.png",
-            description:
-                "Teachers practicing with tablets during a professional development session.",
-        },
-        {
-            id: 6,
-            title: "Community Technology Night",
-            category: "events",
-            image: "/images/gallery6.png",
-            description:
-                "Parents and teachers exploring educational technology together.",
-        },
-    ];*/
-
     const filteredItems =
         activeFilter === "all"
             ? galleryData
@@ -237,7 +188,7 @@ const Gallery = () => {
                                 </div>
                             </div>
 
-                            <div className="mb-20">
+                            {/*<div className="mb-20">
                                 <h1 className="flex justify-center items-center gap-3 text-lg md:text-xl text-white my-3 mb-6">
                                     <div className="w-full border-2 border-gray-200"></div>
                                     <span className="p-2 px-4 rounded-full bg-indigo-500">
@@ -282,7 +233,7 @@ const Gallery = () => {
                                         }
                                     })}
                                 </div>
-                            </div>
+                            </div>*/}
 
                             <div className="mb-20">
                                 <h1 className="flex justify-center items-center gap-3 text-lg md:text-xl text-white my-3 mb-6">

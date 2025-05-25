@@ -29,18 +29,21 @@ const About = () => {
                         <div className="mission-card">
                             <h2>Our Mission</h2>
                             <p>
-                                We’re here to guide you with Edtech tools and
-                                tips that will make your teaching easier,
-                                learning fun, and help you connect with today’s
-                                digital learners.
+                                Our mission is to build teachers that are
+                                equipped with the knowledge of educational
+                                technology, so that they can thrive in this
+                                digital age. By arming teachers with the right
+                                Edtech tools, we aim to ease the teaching
+                                process and create a truly engaging/memorable
+                                learning enviroment for students.
                             </p>
                         </div>
                         <div className="vision-card">
                             <h2>Our Vision</h2>
                             <p>
-                                Helping teachers feel confident, supported, and
-                                ready to teach with tech, one simple step at a
-                                time.
+                                To become the go-to for teachers around the
+                                world who want to transform the teaching and
+                                learning process with educational technology.
                             </p>
                         </div>
                     </div>
@@ -107,6 +110,27 @@ const About = () => {
                             <div
                                 className="value-icon"
                                 style={{
+                                    backgroundColor: "rgba(233, 79, 55, 0.1)",
+                                }}
+                            >
+                                <i
+                                    className="fas fa-chalkboard-teacher"
+                                    style={{ color: "var(--secondary-red)" }}
+                                ></i>
+                            </div>
+                            <h3>Empowerment</h3>
+                            <p>
+                                We believe in the transformational power of a
+                                tech-equipped teacher, so we strive to equip
+                                teachers with the latest Edtech skills and
+                                tools.
+                            </p>
+                        </div>
+
+                        <div className="value-card">
+                            <div
+                                className="value-icon"
+                                style={{
                                     backgroundColor: "rgba(47, 111, 204, 0.1)",
                                 }}
                             >
@@ -117,9 +141,11 @@ const About = () => {
                             </div>
                             <h3>Innovation</h3>
                             <p>
-                                We continuously explore and embrace new
-                                technologies and methodologies to provide
-                                cutting-edge solutions for educators.
+                                Staying at the fore-front of educational
+                                technology developments and digital pedagogies
+                                is our priority. So we are constantly seeking
+                                new ways to improve the teaching and learning
+                                process with digital innovations.
                             </p>
                         </div>
                         <div className="value-card">
@@ -136,30 +162,12 @@ const About = () => {
                             </div>
                             <h3>Accessibility</h3>
                             <p>
-                                We believe educational technology should be
-                                accessible to all teachers, regardless of their
-                                technical background or resources.
+                                Our training and resources materials are
+                                accessible and affordable to all teachers,
+                                regardless of their locations.
                             </p>
                         </div>
-                        <div className="value-card">
-                            <div
-                                className="value-icon"
-                                style={{
-                                    backgroundColor: "rgba(233, 79, 55, 0.1)",
-                                }}
-                            >
-                                <i
-                                    className="fas fa-chalkboard-teacher"
-                                    style={{ color: "var(--secondary-red)" }}
-                                ></i>
-                            </div>
-                            <h3>Practicality</h3>
-                            <p>
-                                We focus on practical, implementable solutions
-                                that address real classroom challenges and
-                                enhance the teaching experience.
-                            </p>
-                        </div>
+
                         <div className="value-card">
                             <div
                                 className="value-icon"
@@ -176,9 +184,11 @@ const About = () => {
                             </div>
                             <h3>Community</h3>
                             <p>
-                                We foster a supportive community where educators
-                                can share experiences, challenges, and successes
-                                in their technology journey.
+                                Support and community cannot be side-lined when
+                                it comes to educators. We believe in building a
+                                supportive and strong community of educators who
+                                are focused on growing together and improving
+                                their crafts.
                             </p>
                         </div>
                     </div>
@@ -376,25 +386,7 @@ const About = () => {
                         </div>
                         <div className="partner-logo">
                             <img
-                                src="https://cdn.worldvectorlogo.com/logos/apple-13.svg"
-                                alt="Partner logo"
-                            />
-                        </div>
-                        <div className="partner-logo">
-                            <img
-                                src="https://cdn.worldvectorlogo.com/logos/samsung-6.svg"
-                                alt="Partner logo"
-                            />
-                        </div>
-                        <div className="partner-logo">
-                            <img
                                 src="https://cdn.worldvectorlogo.com/logos/dell-2.svg"
-                                alt="Partner logo"
-                            />
-                        </div>
-                        <div className="partner-logo">
-                            <img
-                                src="https://cdn.worldvectorlogo.com/logos/intel-2.svg"
                                 alt="Partner logo"
                             />
                         </div>

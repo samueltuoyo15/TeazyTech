@@ -205,7 +205,7 @@ const Resources = () => {
                             <div className="featured-badge">
                                 Featured Resource
                             </div>
-                            <h2>The Complete Guide to Blended Learning</h2>
+                            <h2>Becoming a Tech-savvy Teacher</h2>
                             <p>
                                 This comprehensive guide covers everything you
                                 need to know about implementing blended learning
@@ -218,24 +218,25 @@ const Resources = () => {
                                     PDF Guide
                                 </li>
                                 <li>
-                                    <i className="fas fa-video"></i> 10
+                                    <i className="fas fa-video"></i> 5
                                     Instructional Videos
                                 </li>
                                 <li>
-                                    <i className="fas fa-file-alt"></i> 25
+                                    <i className="fas fa-file-alt"></i> 10
                                     Ready-to-use Templates
                                 </li>
                             </ul>
-                            <Link
-                                to="/resources/featured"
+                            <a
+                                href="https://drive.google.com/file/d/1GAFr_OOxWv4s5vI0TrZmhqW9QPph0ZQ1/view?usp=drivesdk"
+                                target="_blank"
                                 className="btn btn-primary"
                             >
                                 Download Free Guide
-                            </Link>
+                            </a>
                         </div>
                         <div className="featured-resource-image">
                             <img
-                                src="https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80"
+                                src="/images/resourcesFolder/becomingTechSavvyTeacher.png"
                                 alt="Blended Learning Guide"
                             />
                         </div>

@@ -69,7 +69,8 @@ const HeroSection = () => {
                         Empowering Educators with Technology
                     </h1>
                     <p className="hero-description">
-                        Gain the edge you need to educate this advanced generation of learners 
+                        Gain the edge you need to educate this advanced
+                        generation of learners
                     </p>
                     <div className="hero-buttons">
                         <Link to="/services" className="btn btn-primary">
@@ -103,7 +104,7 @@ const HeroSection = () => {
                 <div className="hero-image-container">
                     <div className="hero-image-wrapper">
                         <img
-                            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                            src="/images/Gallery Kaduna Training/IMG_6094.jpg"
                             alt="Teacher using educational technology"
                             className="hero-image"
                         />

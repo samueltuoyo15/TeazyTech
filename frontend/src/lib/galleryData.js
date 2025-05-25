@@ -29,7 +29,7 @@ const galleryData = [
             "/images/Gallery Kaduna Training/IMG_5799.jpg",
             "/images/Gallery Kaduna Training/IMG_5838.jpg",
             "/images/Gallery Kaduna Training/IMG_5839.jpg",
-            "/images/Gallery Kaduna Training/IMG_5852.jpg",
+            "/images/Gallery Kaduna Training/IMG_5852.JPG",
             "/images/Gallery Kaduna Training/IMG_6071.jpg",
             "/images/Gallery Kaduna Training/IMG_6094.jpg",
             "/images/Gallery Kaduna Training/IMG_6147.jpg",
@@ -138,7 +138,7 @@ const galleryData = [
             "/images/workshopPhotos/IMG_8138.jpg",
         ],
         description:
-            "This is a seminar event with our founder as the main Speaker",
+            "A Seminar event with TEAZY Tech as one of the partners.",
         category: "workshops",
     },
 ];
