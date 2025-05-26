@@ -1,5 +1,4 @@
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
 
 export default function FormSection({ setShowSuccess, setShowFailure }) {
     const [fields, setFields] = useState({
@@ -24,7 +23,7 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                 showError.phone === false &&
                 showError.message === false
             ) {
-                emailjs.init("TPxhQrfopzurp7Isq");
+                //emailjs.init("TPxhQrfopzurp7Isq");
 
                 //sending four parameters namely: service Id from emailjs, template Id from emailjs,
                 //formdata and emailjs public key/API key
