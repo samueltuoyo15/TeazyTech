@@ -22,20 +22,19 @@ const Services = () => {
                 <div className="container">
                     <div className="services-overview-content">
                         <div className="services-overview-text">
-                            <h2>How We Help Educators</h2>
+                            <h2>How We Help You Thrive</h2>
                             <p>
-                                At Teazy Tech, we&apos;re here to support you no
-                                matter where you are on your tech journey.
-                                We&apos;ve got simple and practical solutions
-                                made just for you whether you're just getting
-                                started or already using digital tools.
+                                At Teazy Tech, we are here to support you no
+                                matter where you are on your journey to
+                                educational technology integration. Beyond
+                                providing personal workshops and training
+                                sessions for teachers.
                             </p>
                             <p>
-                                Our services are hands-on, easy to apply, and
-                                are built to help you with real classroom
-                                challenges. We’re all about making teaching
-                                easier, learning better and helping you feel
-                                confident with technology, one step at a time.
+                                we also partner with private, public and
+                                governmental institutions to improve technology
+                                integration and position you for success on a
+                                global scale.
                             </p>
                         </div>
                         <div className="services-overview-image">
@@ -110,7 +109,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="/images/Gallery Kaduna Training/IMG_5839.jpg"
+                                    src="/images/workshopPhotos/IMG_7521.jpg"
                                     alt="Professional Development"
                                 />
                             </div>
@@ -170,7 +169,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="/images/Gallery Ibadan Training/IMG_7743.jpg"
+                                    src="/images/Gallery Kaduna Training/watchingTv.jpg"
                                     alt="Technology Integration"
                                 />
                             </div>
@@ -230,7 +229,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="/images/Gallery Ibadan Training/IMG_7741.jpg"
+                                    src="/images/crossedLegs.jpg"
                                     alt="Digital Content Creation"
                                 />
                             </div>
@@ -291,7 +290,7 @@ const Services = () => {
                             </div>
                             <div className="service-item-image">
                                 <img
-                                    src="/images/workshopPhotos/IMG_7528.jpg"
+                                    src="/images/Gallery Ibadan Training/IMG_7739.jpg"
                                     alt="Strategic Planning"
                                 />
                             </div>

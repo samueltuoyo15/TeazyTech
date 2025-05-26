@@ -104,7 +104,7 @@ const HeroSection = () => {
                 <div className="hero-image-container">
                     <div className="hero-image-wrapper">
                         <img
-                            src="/images/Gallery Kaduna Training/IMG_6094.jpg"
+                            src="/images/Gallery Kaduna Training/IMG_5838.jpg"
                             alt="Teacher using educational technology"
                             className="hero-image"
                         />

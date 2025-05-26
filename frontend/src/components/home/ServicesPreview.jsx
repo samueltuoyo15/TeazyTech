@@ -28,7 +28,7 @@ const ServicesPreview = () => {
                     </div>
                     <div className="service-card">
                         <img
-                            src="/images/Gallery Kaduna Training/IMG_5756.jpg"
+                            src="/images/Gallery Ibadan Training/IMG_7713.jpg"
                             alt="Technology Integration"
                         />
                         <h3>Technology Integration</h3>
@@ -45,7 +45,7 @@ const ServicesPreview = () => {
                             src="/images/Gallery Ibadan Training/IMG_7741.jpg"
                             alt="Digital Content Creation"
                         />
-                        <h3>Digital Content Creation</h3>
+                        <h3>Instructional Content Design</h3>
                         <p>
                             Tools and techniques for creating engaging digital
                             learning materials

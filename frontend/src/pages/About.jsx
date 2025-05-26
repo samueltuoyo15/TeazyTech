@@ -14,7 +14,7 @@ const About = () => {
                             knowledge and tools
                         </p>
                         <img
-                            src="/images/workshopPhotos/IMG_7521.jpg"
+                            src="/images/Mastercard Foundation Edtech Conference/IMG_6449.jpg"
                             alt="About Teazy Tech"
                             className="about-hero-image"
                         />
@@ -63,10 +63,10 @@ const About = () => {
                         <div className="our-story-text">
                             <h2>Our Story</h2>
                             <p>
-                                Princess Natasha Momoh has always been deeply
-                                passionate about education. But her heart broke
-                                when she saw how far behind many schools were in
-                                using technology, especially in Africa.
+                                Princess Natasha Balogun Momoh has always been
+                                deeply passionate about education. But her heart
+                                broke when she saw how far behind many schools
+                                were in using technology, especially in Africa.
                             </p>
                             <p>
                                 In 2022, she led a research project to truly
@@ -209,16 +209,15 @@ const About = () => {
                         <div className="team-member">
                             <div className="team-member-image">
                                 <img
-                                    src="/images/workshopPhotos/IMG_8138.jpg"
+                                    src="/images/Teazy Tech Volunteers/princessMomoh.jpg"
                                     alt="Team member"
                                 />
                             </div>
-                            <h3>Princess Natasha Momoh</h3>
+                            <h3>Princess Natasha Balogun Momoh</h3>
                             <p className="team-member-role">Founder & CEO</p>
                             <p className="team-member-bio">
-                                Former high school teacher with 15 years of
-                                experience and a Ph.D. in Educational
-                                Technology.
+                                Learning Designer and Educator with over 5 years
+                                of experience in the professional EdTech space.
                             </p>
                             <div className="team-member-social">
                                 <a href="#" aria-label="LinkedIn">
@@ -229,6 +228,33 @@ const About = () => {
                                 </a>
                             </div>
                         </div>
+
+                        <div className="team-member">
+                            <div className="w-full h-[250px] overflow-hidden">
+                                <img
+                                    className="object-center w-full h-full object-cover transition-transform duration-500"
+                                    src="/images/Teazy Tech Volunteers/Chelsea front picture.jpg"
+                                    alt="Team member"
+                                />
+                            </div>
+                            <h3>Chelsea Julius</h3>
+                            <p className="team-member-role">
+                                Business Assistant and Community Manager
+                            </p>
+                            <p className="team-member-bio">
+                                Business assistant and secondary overseer of
+                                TEAZY Tech’s general operations.
+                            </p>
+                            <div className="team-member-social">
+                                <a href="#" aria-label="LinkedIn">
+                                    <i className="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" aria-label="Twitter">
+                                    <i className="fab fa-twitter"></i>
+                                </a>
+                            </div>
+                        </div>
+
                         <div className="team-member">
                             <div className="team-member-image">
                                 <img
@@ -241,7 +267,8 @@ const About = () => {
                                 Field Representative
                             </p>
                             <p className="team-member-bio">
-                                Our representative
+                                Company representative, promoting Teazy Tech’s
+                                products and services.
                             </p>
                             <div className="team-member-social">
                                 <a href="#" aria-label="LinkedIn">
@@ -291,31 +318,6 @@ const About = () => {
                                 Our professional Video content creator,
                                 versatile with various modern media editing
                                 skills
-                            </p>
-                            <div className="team-member-social">
-                                <a href="#" aria-label="LinkedIn">
-                                    <i className="fab fa-linkedin-in"></i>
-                                </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div className="team-member">
-                            <div className="team-member-image">
-                                <img
-                                    src="/images/Teazy Tech Volunteers/Chelsea Julius.jpg"
-                                    alt="Team member"
-                                />
-                            </div>
-                            <h3>Chelsea Julius</h3>
-                            <p className="team-member-role">
-                                Business Assistant and Community Manager
-                            </p>
-                            <p className="team-member-bio">
-                                Chelsea julius is the secondary overseer of the
-                                business aspects of our communities.
                             </p>
                             <div className="team-member-social">
                                 <a href="#" aria-label="LinkedIn">

@@ -15,14 +15,6 @@ const Resources = () => {
         { id: "tools", name: "Tools & Templates" },
         { id: "research", name: "Research & Case Studies" },
     ];
-    /*resource.id === 1 ? "https://images.unsplash.com/photo-1585247226801-bc613c441316?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" : 
-                         resource.id === 2 ? "https://images.unsplash.com/photo-1611926653458-09294b3142bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" :
-                         resource.id === 3 ? "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" :
-                         resource.id === 4 ? "https://images.unsplash.com/photo-1544396821-4dd40b938ad3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1373&q=80" :
-                         resource.id === 5 ? "https://images.unsplash.com/photo-1594136976553-38728efd5b27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1548&q=80" :
-                         resource.id === 6 ? "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" :
-                         resource.id === 7 ? "https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" :
-                         "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"*/
 
     const resources = [
         {
@@ -207,22 +199,22 @@ const Resources = () => {
                             </div>
                             <h2>Becoming a Tech-savvy Teacher</h2>
                             <p>
-                                This comprehensive guide covers everything you
-                                need to know about implementing blended learning
-                                in your classroom, from technology setup to
-                                curriculum design.
+                                This comprehensive guide was created for
+                                educators struggling to transition from the
+                                traditional ways of teaching to the integration
+                                of educational technology in their classrooms.
                             </p>
                             <ul className="featured-resource-details">
                                 <li>
-                                    <i className="fas fa-file-pdf"></i> 75-page
+                                    <i className="fas fa-file-pdf"></i> 47-page
                                     PDF Guide
                                 </li>
                                 <li>
-                                    <i className="fas fa-video"></i> 5
+                                    <i className="fas fa-video"></i> 4
                                     Instructional Videos
                                 </li>
                                 <li>
-                                    <i className="fas fa-file-alt"></i> 10
+                                    <i className="fas fa-file-alt"></i> 5
                                     Ready-to-use Templates
                                 </li>
                             </ul>

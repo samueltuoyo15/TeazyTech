@@ -79,11 +79,18 @@ const galleryData = [
         category: "volunteers",
     },
     {
+        id: "adetola",
+        title: "Adetola",
+        images: ["/images/Teazy Tech Volunteers/IMG_3556.JPG"],
+        description: "volunteer social media manager and content creator.",
+        category: "volunteers",
+    },
+    {
         id: "chelseaJulius",
         title: "Chelsea Julius",
         images: ["/images/Teazy Tech Volunteers/Chelsea Julius.jpg"],
         description: "Business Assistant and Community Manager",
-        category: "volunteers",
+        category: "v",
     },
     {
         id: "abimbolaAbiodun",
@@ -137,8 +144,7 @@ const galleryData = [
             "/images/workshopPhotos/IMG_7532.jpg",
             "/images/workshopPhotos/IMG_8138.jpg",
         ],
-        description:
-            "A Seminar event with TEAZY Tech as one of the partners.",
+        description: "A Seminar event with TEAZY Tech as one of the partners.",
         category: "workshops",
     },
 ];
