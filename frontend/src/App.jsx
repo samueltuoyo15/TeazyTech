@@ -17,7 +17,7 @@ import Posts from "./AdminDashboardPages/Posts";
 import CreatePost from "./AdminDashboardPages/CreatePost";
 import EditPost from "./AdminDashboardPages/EditPost";
 import Categories from "./AdminDashboardPages/Categories";
-import { AuthProvider } from "./context/AuthContext.jsx";
+import { AuthProvider } from "./Context/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const App = () => {
