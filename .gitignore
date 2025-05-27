@@ -1,0 +1,4 @@
+node_modules/
+.env
+make-admin.js
+pass.txt
