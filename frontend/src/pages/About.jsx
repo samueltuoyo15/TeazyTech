@@ -328,6 +328,32 @@ const About = () => {
                                 </a>
                             </div>
                         </div>
+
+                        <div className="team-member">
+                            <div className="w-full h-[250px] overflow-hidden">
+                                <img
+                                    className="object-center w-full h-full object-cover transition-transform duration-500"
+                                    src="/images/Teazy Tech Volunteers/IMG_3556.JPG"
+                                    alt="Team member"
+                                />
+                            </div>
+                            <h3>Adetola</h3>
+                            <p className="team-member-role">
+                                Social Media Manager
+                            </p>
+                            <p className="team-member-bio">
+                                volunteer social media manager and content
+                                creator.
+                            </p>
+                            <div className="team-member-social">
+                                <a href="#" aria-label="LinkedIn">
+                                    <i className="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" aria-label="Twitter">
+                                    <i className="fab fa-twitter"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -344,19 +370,15 @@ const About = () => {
                     </div>
                     <div className="impact-stats">
                         <div className="impact-stat">
-                            <div className="impact-number">10,000+</div>
+                            <div className="impact-number">500+</div>
                             <p>Teachers Trained</p>
                         </div>
                         <div className="impact-stat">
-                            <div className="impact-number">500+</div>
+                            <div className="impact-number">60+</div>
                             <p>Schools Partnered</p>
                         </div>
                         <div className="impact-stat">
-                            <div className="impact-number">45+</div>
-                            <p>Countries Reached</p>
-                        </div>
-                        <div className="impact-stat">
-                            <div className="impact-number">200,000+</div>
+                            <div className="impact-number">20,000+</div>
                             <p>Students Impacted</p>
                         </div>
                     </div>

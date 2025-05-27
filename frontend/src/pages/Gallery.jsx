@@ -389,11 +389,11 @@ const Gallery = () => {
             <section className="section gallery-cta">
                 <div className="container">
                     <div className="gallery-cta-content text-center">
-                        <h2>Want to See More?</h2>
+                        <h2>Ready to Upscale?</h2>
                         <p>
-                            Contact us to schedule a demonstration or to learn
+                            Contact us to book a free a clarity call and learn
                             more about how Teazy Tech can transform your
-                            educational environment.
+                            teaching environment.
                         </p>
                         <div className="gallery-cta-buttons">
                             <a href="/contact" className="btn btn-primary">
