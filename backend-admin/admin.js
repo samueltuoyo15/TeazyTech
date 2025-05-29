@@ -50,7 +50,7 @@ app.post("/api/admin/login", async (req, res) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const userDoc = await admin.firestore().collection("users").doc(data.localId).get();
+    const userDoc = await admin.firestore().collection("user").doc(data.localId).get();
     if (!userDoc.exists) {
       return res.status(404).json({ error: "User profile not found" });
     }
@@ -62,7 +62,7 @@ app.post("/api/admin/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production", 
       maxAge: 3600 * 1000,
       path: "/",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" // Changed to "none" for cross-site
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" 
     });
 
     res.json({
@@ -88,7 +88,7 @@ app.get("/api/admin/me", async (req, res) => {
 
   try {
     const decoded = await admin.auth().verifyIdToken(token);
-    const userDoc = await admin.firestore().collection("users").doc(decoded.uid).get();
+    const userDoc = await admin.firestore().collection("user").doc(decoded.uid).get();
     
     if (!userDoc.exists) {
       return res.status(404).json({ error: "User profile not found" });
