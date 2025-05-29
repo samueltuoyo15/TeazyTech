@@ -13,7 +13,7 @@ import { mockBlogStats } from '../data/mockData';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { totalPosts, totalCategories, recentPosts, postsByCategory, viewsOverTime } = mockBlogStats;
+  const { recentPosts, postsByCategory, viewsOverTime } = mockBlogStats;
 
   return (
     <Layout title="Dashboard">
@@ -31,7 +31,7 @@ const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Posts</p>
-              <p className="text-2xl font-semibold text-gray-800">{totalPosts}</p>
+              <p className="text-2xl font-semibold text-gray-800">{user?.total_posts}</p>
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@ const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Categories</p>
-              <p className="text-2xl font-semibold text-gray-800">{totalCategories}</p>
+              <p className="text-2xl font-semibold text-gray-800">{user?.total_categories}</p>
             </div>
           </div>
         </div>
@@ -53,7 +53,7 @@ const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Views</p>
-              <p className="text-2xl font-semibold text-gray-800">12,945</p>
+              <p className="text-2xl font-semibold text-gray-800">{user?.total_views}</p>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ const Dashboard = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div 
                       className="bg-[#e94235] h-2.5 rounded-full" 
-                      style={{ width: `${(category.count / totalPosts) * 100}%` }}
+                      style={{ width: `${(category.count / user?.total_posts) * 100}%` }}
                     ></div>
                   </div>
                 </li>

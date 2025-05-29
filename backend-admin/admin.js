@@ -50,27 +50,34 @@ app.post("/api/admin/login", async (req, res) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
-   res.cookie("accessToken", data.idToken, {
+    const userDoc = await admin.firestore().collection("users").doc(data.localId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: "User profile not found" });
+    }
+
+    const userData = userDoc.data();
+ 
+    res.cookie("accessToken", data.idToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only secure in production
+      secure: process.env.NODE_ENV === "production", 
       maxAge: 3600 * 1000,
       path: "/",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax"
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" // Changed to "none" for cross-site
     });
 
     res.json({
       uid: data.localId,
       email: user.email,
-      name: user.name,
-      total_posts: user.total_posts,
-      total_categories: user.total_categories,
-      total_views: user.total_views
+      name: userData?.name || '',
+      total_posts: userData?.total_posts || 0,
+      total_categories: userData?.total_categories || 0,
+      total_views: userData?.total_views || 0
     });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ error: "Login failed" });
   }
 });
-
 
 app.get("/api/admin/me", async (req, res) => {
   const token = req.cookies.accessToken;
@@ -81,14 +88,25 @@ app.get("/api/admin/me", async (req, res) => {
 
   try {
     const decoded = await admin.auth().verifyIdToken(token);
-    const user = await admin.auth().getUser(decoded.uid);
+    const userDoc = await admin.firestore().collection("users").doc(decoded.uid).get();
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: "User profile not found" });
+    }
 
+    const user = await admin.auth().getUser(decoded.uid);
+    const userData = userDoc.data();
+     
     res.json({
-      uid: user.uid,
+      uid: decoded.uid,
       email: user.email,
-      isAdmin: user.customClaims?.admin === true
+      name: userData?.name || '',
+      total_posts: userData?.total_posts || 0,
+      total_categories: userData?.total_categories || 0,
+      total_views: userData?.total_views || 0
     });
   } catch (error) {
+    console.error("ME endpoint error:", error);
     res.status(401).json({ error: "Invalid token" });
   }
 });
