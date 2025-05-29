@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-
+import axios from "axios"
 const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
@@ -15,34 +15,39 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user in localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const getAuthAdmin = async () => {
+     try {
+      const response = await axios.get("http://localhost:5000/api/admin/me", { withCredentials: true })
+      setUser(response.data)
+    } catch(error) {
+        setUser(null)
+        console.error('Error fetching admin credentials:', error)
+      }
     }
-    setIsLoading(false);
+    getAuthAdmin()
   }, []);
 
   const login = async (email, password) => {
-    // For demo purposes - in production, this would call your authentication API
-    if (email === 'admin@example.com' && password === 'password') {
-      const user = {
-        id: '1',
-        name: 'Admin User',
-        email: 'admin@example.com',
-        role: 'admin',
-      };
-      setUser(user);
-      localStorage.setItem('user', JSON.stringify(user));
-      return true;
+    try {
+      const response = await axios.post("http://localhost:5000/api/admin/login",{ email, password})
+      setUser(response.data)
+      return true
+    } catch(error) {
+      console.log("failed to login:", error)
+      return false
+    } finally {
+      setIsLoading(false)
     }
-    return false;
   };
 
-  const logout = () => {
+const logout = async () => {
+  try {
+    await axios.post("http://localhost:5000/api/admin/logout", {}, { withCredentials: true });
     setUser(null);
-    localStorage.removeItem('user');
-  };
+  } catch(error) {
+    console.error('Error during logout:', error);
+  }
+};
 
   return (
     <AuthContext.Provider

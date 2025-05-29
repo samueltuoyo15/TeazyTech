@@ -79,7 +79,7 @@ app.get("/api/admin/me", async (req, res) => {
 
 app.post("/api/admin/logout", (req, res) => {
   res.clearCookie("accessToken")
-  res.json({ message: "Logged out" })
+  res.redirect("http://localhost:3000/login")
 })
 
 app.listen(5000, () => console.log("Backend running on port 5000"))
