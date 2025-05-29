@@ -61,7 +61,10 @@ app.post("/api/admin/login", async (req, res) => {
     res.json({
       uid: data.localId,
       email: user.email,
-      isAdmin: true
+      name: user.name,
+      total_posts: user.total_posts,
+      total_categories: user.total_categories,
+      total_views: user.total_views
     });
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
