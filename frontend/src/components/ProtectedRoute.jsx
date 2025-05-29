@@ -9,11 +9,7 @@ const ProtectedRoute = ({ children }) => {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-export default ProtectedRoute;
+export default ProtectedRoute

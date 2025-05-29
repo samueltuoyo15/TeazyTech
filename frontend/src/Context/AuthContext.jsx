@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from "axios"
+import axios from "axios";
+
 const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
@@ -13,48 +14,94 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); 
 
   useEffect(() => {
+    axios.defaults.withCredentials = true;
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+    
     const getAuthAdmin = async () => {
-     try {
-      const response = await axios.get("http://localhost:5000/api/admin/me", { withCredentials: true })
-      setUser(response.data)
-    } catch(error) {
-        setUser(null)
-        console.error('Error fetching admin credentials:', error)
+      try {
+        const response = await axios.get("http://localhost:5000/api/admin/me", { 
+          withCredentials: true,
+          signal: controller.signal
+        });
+        if (isMounted) {
+          setUser(response.data);
+          setIsAuthenticated(true); 
+          setError(null);
+        }
+      } catch(error) {
+        if (isMounted && !axios.isCancel(error)) {
+          setUser(null);
+          setIsAuthenticated(false);
+          setError(error.response?.data?.error || "Session expired");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-    }
-    getAuthAdmin()
+    };
+    
+    getAuthAdmin();
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/admin/login",{ email, password})
-      setUser(response.data)
-      return true
+      setIsLoading(true);
+      const response = await axios.post(
+        "http://localhost:5000/api/admin/login", 
+        { email, password },
+        { withCredentials: true }
+      );
+      setUser(response.data);
+      setIsAuthenticated(true); 
+      setError(null);
+      return true;
     } catch(error) {
-      console.log("failed to login:", error)
-      return false
+      setError(error.response?.data?.error || "Login failed");
+      setIsAuthenticated(false);
+      return false;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
 
-const logout = async () => {
-  try {
-    await axios.post("http://localhost:5000/api/admin/logout", {}, { withCredentials: true });
-    setUser(null);
-  } catch(error) {
-    console.error('Error during logout:', error);
-  }
-};
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      await axios.post(
+        "http://localhost:5000/api/admin/logout", 
+        {}, 
+        { withCredentials: true }
+      );
+      setUser(null);
+      setIsAuthenticated(false);
+      setError(null);
+    } catch(error) {
+      setError("Logout failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated, 
         isLoading,
+        error,
         login,
         logout,
       }}
