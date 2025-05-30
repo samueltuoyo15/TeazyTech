@@ -1,31 +1,52 @@
-import express from "express";
-import admin from "firebase-admin";
-import cookieParser from "cookie-parser";
-import fetch from "node-fetch";
-import dotenv from "dotenv";
-import cors from "cors";
-dotenv.config();
+import express from "express"
+import admin from "firebase-admin"  
+import cookieParser from "cookie-parser"
+import fetch from "node-fetch"
+import dotenv from "dotenv"
+import cors from "cors"
+import pino from "pino"
 
-const app = express();
+const logger = pino({
+  transport: { target: 'pino-pretty' },
+  level: "debug"
+})
+
+dotenv.config()
+
+const app = express()
 
 app.use(cors({
   origin: "http://localhost:3000",
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));  
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}))
 
-app.use(express.json());
-app.use(cookieParser());
+app.use(express.json())
+app.use(cookieParser())
 
-admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS))
-});
+logger.info("Initializing Firebase Admin SDK...")
 
-const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
+let db
+try {
+  const credentials = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS)
+  admin.initializeApp({ credential: admin.credential.cert(credentials) })
+  db = admin.firestore()
+  logger.info("Firebase Admin initialized successfully")
+} catch (err) {
+  logger.error("Failed to initialize Firebase Admin", err)
+  process.exit(1)
+}
+
+const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY
+if (!FIREBASE_API_KEY) {
+  logger.error("Missing FIREBASE_API_KEY in .env")
+  process.exit(1)
+}
 
 app.post("/api/admin/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body
+  logger.info("Login attempt", { email })
 
   try {
     const response = await fetch(
@@ -35,89 +56,90 @@ app.post("/api/admin/login", async (req, res) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, returnSecureToken: true })
       }
-    );
+    )
     
-    const data = await response.json();
-
+    const data = await response.json()
     if (data.error) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      logger.warn("Firebase auth error", data.error)
+      return res.status(401).json(data.error)
     }
 
-    const user = await admin.auth().getUser(data.localId);
-    const isAdmin = user.customClaims?.admin === true;
+    const user = await admin.auth().getUser(data.localId)
+    const isAdmin = user.customClaims?.admin === true
 
     if (!isAdmin) {
-      return res.status(403).json({ error: "Access denied" });
+      logger.warn("Admin access denied", { uid: user.uid })
+      return res.status(403).json({ 
+        error: "Admin access denied",
+        uid: user.uid,
+        email: user.email
+      })
     }
 
-    const userDoc = await admin.firestore().collection("user").doc(data.localId).get();
+    const userDoc = await db.collection("user").doc(user.uid).get()
     if (!userDoc.exists) {
-      return res.status(404).json({ error: "User profile not found" });
+      logger.error("Missing user document", { uid: user.uid })
+      return res.status(404).json({
+        error: "User document not found",
+        uid: user.uid
+      })
     }
 
-    const userData = userDoc.data();
- 
+    const userData = userDoc.data()
     res.cookie("accessToken", data.idToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
+      secure: process.env.NODE_ENV === "production",
       maxAge: 3600 * 1000,
       path: "/",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" 
-    });
+      sameSite: "lax"
+    })
 
-    res.json({
-      uid: data.localId,
+    return res.json({
+      uid: user.uid,
       email: user.email,
-      name: userData?.name || '',
-      total_posts: userData?.total_posts || 0,
-      total_categories: userData?.total_categories || 0,
-      total_views: userData?.total_views || 0
-    });
+      ...userData
+    })
+
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Login failed" });
+    logger.error("Login failed", error)
+    return res.status(500).json({
+      error: "Login failed",
+      message: error.message
+    })
   }
-});
+})
 
 app.get("/api/admin/me", async (req, res) => {
-  const token = req.cookies.accessToken;
-  
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  const token = req.cookies.accessToken
+  if (!token) return res.status(401).json({ error: "Unauthorized" })
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    const userDoc = await admin.firestore().collection("user").doc(decoded.uid).get();
-    
+    const decoded = await admin.auth().verifyIdToken(token)
+    const user = await admin.auth().getUser(decoded.uid)
+    const userDoc = await db.collection("user").doc(user.uid).get()
+
     if (!userDoc.exists) {
-      return res.status(404).json({ error: "User profile not found" });
+      return res.status(404).json({ error: "User document not found" })
     }
 
-    const user = await admin.auth().getUser(decoded.uid);
-    const userData = userDoc.data();
-     
-    res.json({
-      uid: decoded.uid,
+    return res.json({
+      uid: user.uid,
       email: user.email,
-      name: userData?.name || '',
-      total_posts: userData?.total_posts || 0,
-      total_categories: userData?.total_categories || 0,
-      total_views: userData?.total_views || 0
-    });
+      ...userDoc.data()
+    })
+
   } catch (error) {
-    console.error("ME endpoint error:", error);
-    res.status(401).json({ error: "Invalid token" });
+    logger.error("ME endpoint failed", error)
+    return res.status(401).json({ 
+      error: "Invalid token",
+      message: error.message 
+    })
   }
-});
+})
 
 app.post("/api/admin/logout", (req, res) => {
-  res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax"
-  });
-  res.json({ message: "Logged out successfully" });
-});
+  res.clearCookie("accessToken")
+  return res.json({ message: "Logged out" })
+})
 
-app.listen(5000, () => console.log("Backend running on port 5000"));
+app.listen(5000, () => logger.info(" Server running on port 5000"))
