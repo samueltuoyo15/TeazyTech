@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Image, Calendar, Tag, AlertTriangle } from 'lucide-react';
 import RichTextEditor from '../components/RichTextEditor';
+import axios from "axios"
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -13,16 +14,11 @@ const CreatePost = () => {
   const [thumbnail, setThumbnail] = useState('');
   const [thumbnailPreview, setThumbnailPreview] = useState('');
   const [publishDate, setPublishDate] = useState(new Date().toISOString().split('T')[0]);
-  const [status, setStatus] = useState('Draft');
+  const [status, setStatus] = useState('draft');
   const [errors, setErrors] = useState({});
   
   const categories = [
-    'Technology', 
-    'Education', 
-    'Programming', 
-    'AI & ML', 
-    'Web Development', 
-    'Software Engineering'
+   'tech', 'general', 'business', 'entertainment', 'health'
   ];
 
   const handleThumbnailChange = (e) => {
@@ -43,14 +39,42 @@ const CreatePost = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
     
-    // Here you would normally submit to your API
+    try {
+    const response = await axios.post("http://localhost:5000/api/admin/create-post", {
+      title, excerpt, content, category, thumbnail, status, published_date: publishDate
+    }, { withCredentials: true })
+    
+    if(response.status === 201) {
     alert(`Post "${title}" created successfully!`);
     navigate('/posts');
+    return 
+    }
+    
+    throw new Error(response.data?.error)
+  } catch(error) {
+  console.error("Post creation error:", error);
+ 
+  if (error.response?.data?.errors) {
+    const backendErrors = error.response.data.errors.reduce((acc, err) => {
+      acc[err.field] = err.message;
+      return acc;
+    }, {});
+    setErrors(backendErrors);
+  } 
+
+  else {
+    alert(
+      error.response?.data?.error || 
+      error.response?.data?.message || 
+      "Failed to create post. Check console for details."
+    );
+  }
+}
   };
 
   return (
@@ -182,8 +206,8 @@ const CreatePost = () => {
                       id="draft"
                       name="status"
                       type="radio"
-                      checked={status === 'Draft'}
-                      onChange={() => setStatus('Draft')}
+                      checked={status === 'draft'}
+                      onChange={() => setStatus('draft')}
                       className="h-4 w-4 text-[#e94235] border-gray-300 focus:ring-[#e94235]"
                     />
                     <label htmlFor="draft" className="ml-2 block text-sm text-gray-700">
@@ -195,8 +219,8 @@ const CreatePost = () => {
                       id="published"
                       name="status"
                       type="radio"
-                      checked={status === 'Published'}
-                      onChange={() => setStatus('Published')}
+                      checked={status === 'published'}
+                      onChange={() => setStatus('published')}
                       className="h-4 w-4 text-[#e94235] border-gray-300 focus:ring-[#e94235]"
                     />
                     <label htmlFor="published" className="ml-2 block text-sm text-gray-700">
@@ -276,7 +300,7 @@ const CreatePost = () => {
             type="submit"
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#e94235] hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235]"
           >
-            {status === 'Published' ? 'Publish Post' : 'Save Draft'}
+            {status === 'published' ? 'Publish Post' : 'Save Draft'}
           </button>
         </div>
       </form>
