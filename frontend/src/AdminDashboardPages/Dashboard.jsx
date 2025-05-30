@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useAuth } from '../Context/AuthContext';
-import { 
-  FileText, 
-  Tag, 
-  Clock, 
-  Eye, 
-  BarChart3,
-  Calendar 
-} from 'lucide-react';
-import { mockBlogStats } from '../data/mockData';
-import axios from "axios"
+import {  FileText, Tag, Clock, Eye, BarChart3,Calendar } from 'lucide-react';
+import axios from "axios";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [recentPosts, setRecentPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { postsByCategory, viewsOverTime } = mockBlogStats;
+  const [recentActivities, setRecentActivities] = useState([]);
 
   const getCategoryCounts = () => {
     const counts = {};
@@ -35,6 +27,34 @@ const Dashboard = () => {
           withCredentials: true
         });
         setRecentPosts(response.data);
+           const activities = [
+          ...response.data.slice(0, 3).map(post => ({
+            type: 'post',
+            icon: <FileText className="w-3 h-3 text-blue-800" />,
+            color: 'blue',
+            title: post.status === 'published' ? 'New post published' : 'Draft post created',
+            description: `"${post.title}" in ${post.category} category`,
+            timeAgo: post.timeAgo
+          })),
+          {
+            type: 'category',
+            icon: <Tag className="w-3 h-3 text-green-800" />,
+            color: 'green',
+            title: 'Categories updated',
+            description: `${getCategoryCounts().length} active categories`,
+            timeAgo: "3 days ago"
+          },
+          {
+            type: 'views',
+            icon: <Eye className="w-3 h-3 text-purple-800" />,
+            color: 'purple',
+            title: 'Blog traffic',
+            description: `Total views: ${user?.total_views || 0}`,
+            timeAgo: "1 day ago"
+          }
+        ];
+        
+        setRecentActivities(activities.sort((a, b) => new Date(b.date) - new Date(a.date)));
       } catch (err) {
         console.error('Error fetching posts:', err);
       } finally {
@@ -42,7 +62,7 @@ const Dashboard = () => {
       }
     };
     fetchPosts();
-  }, []);
+  }, [user?.total_views]);
   
   if (loading) {
     return (
@@ -168,48 +188,24 @@ const Dashboard = () => {
         </div>
         <div className="p-6">
           <ol className="border-l border-gray-200">
-            <li className="mb-6 ml-6">
-              <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white">
-                <FileText className="w-3 h-3 text-blue-800" />
-              </span>
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <div className="justify-between items-center mb-3 sm:flex">
-                  <time className="mb-1 text-xs font-normal text-gray-500 sm:order-last sm:mb-0">2 hours ago</time>
-                  <div className="text-sm font-semibold text-gray-900">New post created</div>
+            {recentActivities.map((activity, index) => (
+              <li key={index} className="mb-6 ml-6">
+                <span className={`absolute flex items-center justify-center w-6 h-6 bg-${activity.color}-100 rounded-full -left-3 ring-8 ring-white`}>
+                  {activity.icon}
+                </span>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                  <div className="justify-between items-center mb-3 sm:flex">
+                    <time className="mb-1 text-xs font-normal text-gray-500 sm:order-last sm:mb-0">
+                      {activity.timeAgo}
+                    </time>
+                    <div className="text-sm font-semibold text-gray-900">{activity.title}</div>
+                  </div>
+                  <div className="text-sm font-normal text-gray-600">
+                    {activity.description}
+                  </div>
                 </div>
-                <div className="text-sm font-normal text-gray-600">
-                  "10 Essential EdTech Tools Every Teacher Should Know" was published in the Education category.
-                </div>
-              </div>
-            </li>
-            <li className="mb-6 ml-6">
-              <span className="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white">
-                <Tag className="w-3 h-3 text-green-800" />
-              </span>
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <div className="justify-between items-center mb-3 sm:flex">
-                  <time className="mb-1 text-xs font-normal text-gray-500 sm:order-last sm:mb-0">1 day ago</time>
-                  <div className="text-sm font-semibold text-gray-900">Category updated</div>
-                </div>
-                <div className="text-sm font-normal text-gray-600">
-                  "Programming" category was updated with a new description.
-                </div>
-              </div>
-            </li>
-            <li className="ml-6">
-              <span className="absolute flex items-center justify-center w-6 h-6 bg-purple-100 rounded-full -left-3 ring-8 ring-white">
-                <Eye className="w-3 h-3 text-purple-800" />
-              </span>
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <div className="justify-between items-center mb-3 sm:flex">
-                  <time className="mb-1 text-xs font-normal text-gray-500 sm:order-last sm:mb-0">3 days ago</time>
-                  <div className="text-sm font-semibold text-gray-900">Traffic spike</div>
-                </div>
-                <div className="text-sm font-normal text-gray-600">
-                  Blog traffic increased by 24% compared to last week.
-                </div>
-              </div>
-            </li>
+              </li>
+            ))}
           </ol>
         </div>
       </div>
