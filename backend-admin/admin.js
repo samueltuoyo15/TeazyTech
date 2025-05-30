@@ -315,6 +315,131 @@ app.get("/api/admin/posts", async (req, res) => {
   }
 })
 
+app.put("/api/admin/posts/:postId", async (req, res) => {
+  const token = req.cookies.accessToken
+  const postId = req.params.postId
+
+  logger.debug("Edit post request received", {
+    postId,
+    headers: req.headers,
+    cookies: req.cookies,
+    body: req.body
+  })
+
+  if (!token) {
+    logger.warn("Unauthorized edit post attempt - No token provided")
+    return res.status(401).json({ error: "Unauthorized" })
+  }
+
+  if (!postId || typeof postId !== 'string') {
+    logger.warn("Invalid post ID provided for edit")
+    return res.status(400).json({ error: "Invalid post ID" })
+  }
+
+  try {
+    logger.debug("Verifying ID token...")
+    const decoded = await admin.auth().verifyIdToken(token)
+    logger.debug("Token verified successfully", { uid: decoded.uid })
+
+    logger.debug("Fetching user data...")
+    const user = await admin.auth().getUser(decoded.uid)
+    const isAdmin = user.customClaims?.admin === true
+    logger.debug("User fetched", {
+      email: user.email,
+      uid: user.uid,
+      isAdmin
+    })
+
+    if (!isAdmin) {
+      logger.warn("Admin access denied for user", {
+        email: user.email,
+        uid: user.uid
+      })
+      return res.status(403).json({ error: "Admin access required" })
+    }
+
+    logger.debug("Validating request body...")
+    const { error, value } = postSchema.validate(req.body, {
+      abortEarly: false,
+      allowUnknown: false
+    })
+
+    if (error) {
+      const errors = error.details.map(detail => ({
+        field: detail.path[0],
+        message: detail.message.replace(/"/g, ''),
+        type: detail.type
+      }))
+      
+      logger.error("Validation failed", {
+        validationErrors: errors,
+        receivedBody: req.body
+      })
+      
+      return res.status(400).json({ errors })
+    }
+
+    logger.debug("Validation successful", { validatedData: value })
+
+    const postRef = db.collection("posts").doc(postId)
+    const postDoc = await postRef.get()
+
+    if (!postDoc.exists) {
+      logger.warn("Post not found for editing", { postId })
+      return res.status(404).json({ error: "Post not found" })
+    }
+
+    const updateData = {
+      ...value,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    }
+
+    logger.debug("Attempting to update post in Firestore", { updateData })
+    await postRef.update(updateData)
+    
+    const updatedPost = (await postRef.get()).data()
+    
+    logger.info("Post updated successfully", {
+      postId,
+      author: user.email,
+      title: updateData.title,
+      category: updateData.category
+    })
+    
+    return res.json({
+      message: "Post updated successfully",
+      postId: postId,
+      ...updatedPost
+    })
+
+  } catch (error) {
+    logger.error({
+      msg: "Post update failed",
+      error: {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        code: error.code
+      },
+      postId,
+      requestBody: req.body,
+      tokenInfo: token ? "present" : "missing"
+    })
+
+    if (error.code === 'firestore') {
+      logger.error("Firestore operation failed", {
+        details: error.details
+      })
+    }
+
+    return res.status(500).json({
+      error: "Post update failed",
+      message: error.message,
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    })
+  }
+})
+
 app.delete("/api/admin/posts/:postId", async (req, res) => {
   const token = req.cookies.accessToken
   if (!token) {

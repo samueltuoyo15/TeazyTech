@@ -1,83 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Layout from '../components/Layout';
-import { Image, Calendar, Tag, AlertTriangle } from 'lucide-react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { mockPosts } from '../data/mockData';
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import Layout from '../components/Layout'
+import { Image, Calendar, Tag, AlertTriangle } from 'lucide-react'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+import axios from 'axios'
 
 const EditPost = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [category, setCategory] = useState('');
-  const [thumbnail, setThumbnail] = useState('');
-  const [thumbnailPreview, setThumbnailPreview] = useState('');
-  const [publishDate, setPublishDate] = useState('');
-  const [status, setStatus] = useState('Draft');
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [excerpt, setExcerpt] = useState('')
+  const [category, setCategory] = useState('')
+  const [thumbnail, setThumbnail] = useState('')
+  const [thumbnailPreview, setThumbnailPreview] = useState('')
+  const [publishDate, setPublishDate] = useState('')
+  const [status, setStatus] = useState('draft')
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(true)
   
-  const categories = [
-    'Technology', 
-    'Education', 
-    'Programming', 
-    'AI & ML', 
-    'Web Development', 
-    'Software Engineering'
-  ];
+  const categories = ['tech', 'general', 'business', 'entertainment', 'health']
 
   useEffect(() => {
-    // Fetch post data
-    const post = mockPosts.find(post => post.id === id);
-    
-    if (post) {
-      setTitle(post.title);
-      setContent(post.content || '');
-      setExcerpt(post.excerpt || '');
-      setCategory(post.category);
-      setThumbnail(post.image || '');
-      setThumbnailPreview(post.image || '');
-      setStatus(post.status);
-      
-      // Format date for input
-      const dateObj = new Date(post.date);
-      const formattedDate = dateObj.toISOString().split('T')[0];
-      setPublishDate(formattedDate);
+    const fetchPost = async () => {
+      try {
+        const response = await axios.get(`/api/admin/posts/${id}`, {
+          withCredentials: true
+        })
+        
+        const post = response.data
+        setTitle(post.title)
+        setContent(post.content || '')
+        setExcerpt(post.excerpt || '')
+        setCategory(post.category)
+        setThumbnail(post.thumbnail || '')
+        setThumbnailPreview(post.thumbnail || '')
+        setStatus(post.status)
+        
+        if (post.published_date) {
+          const dateObj = new Date(post.published_date)
+          const formattedDate = dateObj.toISOString().split('T')[0]
+          setPublishDate(formattedDate)
+        }
+      } catch (error) {
+        console.error('Error fetching post:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    setLoading(false);
-  }, [id]);
+
+    fetchPost()
+  }, [id])
 
   const handleThumbnailChange = (e) => {
-    const url = e.target.value;
-    setThumbnail(url);
-    setThumbnailPreview(url);
-  };
+    const url = e.target.value
+    setThumbnail(url)
+    setThumbnailPreview(url)
+  }
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {}
     
-    if (!title.trim()) newErrors.title = 'Title is required';
-    if (!content.trim()) newErrors.content = 'Content is required';
-    if (!category) newErrors.category = 'Category is required';
-    if (!publishDate) newErrors.publishDate = 'Publish date is required';
+    if (!title.trim()) newErrors.title = 'Title is required'
+    if (!content.trim()) newErrors.content = 'Content is required'
+    if (!category) newErrors.category = 'Category is required'
+    if (!publishDate) newErrors.publishDate = 'Publish date is required'
     
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     
-    if (!validateForm()) return;
+    if (!validateForm()) return
     
-    // Here you would normally submit to your API
-    alert(`Post "${title}" updated successfully!`);
-    navigate('/posts');
-  };
+    try {
+      const response = await axios.put(`/api/admin/posts/${id}`, {
+        title,
+        excerpt,
+        content,
+        category,
+        thumbnail,
+        status,
+        published_date: publishDate
+      }, {
+        withCredentials: true
+      })
+
+      navigate('/posts')
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        const backendErrors = error.response.data.errors.reduce((acc, err) => {
+          acc[err.field] = err.message
+          return acc
+        }, {})
+        setErrors(backendErrors)
+      } else {
+        console.error('Error updating post:', error)
+      }
+    }
+  }
 
   const modules = {
     toolbar: [
@@ -86,8 +110,8 @@ const EditPost = () => {
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       ['link', 'image', 'video'],
       ['clean']
-    ],
-  };
+    ]
+  }
 
   if (loading) {
     return (
@@ -96,7 +120,7 @@ const EditPost = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e94235]"></div>
         </div>
       </Layout>
-    );
+    )
   }
 
   return (
@@ -107,7 +131,6 @@ const EditPost = () => {
             <h3 className="text-lg font-medium">Edit Post</h3>
           </div>
           <div className="p-6">
-            {/* Title */}
             <div className="mb-6">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                 Title <span className="text-red-500">*</span>
@@ -128,7 +151,6 @@ const EditPost = () => {
               )}
             </div>
 
-            {/* Excerpt */}
             <div className="mb-6">
               <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 mb-1">
                 Excerpt
@@ -143,7 +165,6 @@ const EditPost = () => {
               ></textarea>
             </div>
 
-            {/* Content */}
             <div className="mb-6">
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
                 Content <span className="text-red-500">*</span>
@@ -169,13 +190,11 @@ const EditPost = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Post Settings */}
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Post Settings</h3>
             </div>
             <div className="p-6">
-              {/* Category */}
               <div className="mb-6">
                 <label htmlFor="category" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <Tag className="h-4 w-4 mr-1" />
@@ -200,7 +219,6 @@ const EditPost = () => {
                 )}
               </div>
 
-              {/* Publish Date */}
               <div className="mb-6">
                 <label htmlFor="publishDate" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <Calendar className="h-4 w-4 mr-1" />
@@ -221,7 +239,6 @@ const EditPost = () => {
                 )}
               </div>
 
-              {/* Status */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -232,8 +249,8 @@ const EditPost = () => {
                       id="draft"
                       name="status"
                       type="radio"
-                      checked={status === 'Draft'}
-                      onChange={() => setStatus('Draft')}
+                      checked={status === 'draft'}
+                      onChange={() => setStatus('draft')}
                       className="h-4 w-4 text-[#e94235] border-gray-300 focus:ring-[#e94235]"
                     />
                     <label htmlFor="draft" className="ml-2 block text-sm text-gray-700">
@@ -245,8 +262,8 @@ const EditPost = () => {
                       id="published"
                       name="status"
                       type="radio"
-                      checked={status === 'Published'}
-                      onChange={() => setStatus('Published')}
+                      checked={status === 'published'}
+                      onChange={() => setStatus('published')}
                       className="h-4 w-4 text-[#e94235] border-gray-300 focus:ring-[#e94235]"
                     />
                     <label htmlFor="published" className="ml-2 block text-sm text-gray-700">
@@ -258,7 +275,6 @@ const EditPost = () => {
             </div>
           </div>
 
-          {/* Featured Image */}
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Featured Image</h3>
@@ -292,8 +308,8 @@ const EditPost = () => {
                       type="button"
                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
                       onClick={() => {
-                        setThumbnail('');
-                        setThumbnailPreview('');
+                        setThumbnail('')
+                        setThumbnailPreview('')
                       }}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,7 +329,6 @@ const EditPost = () => {
           </div>
         </div>
 
-        {/* Form Actions */}
         <div className="flex items-center justify-end space-x-4">
           <button
             type="button"
@@ -326,12 +341,12 @@ const EditPost = () => {
             type="submit"
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#e94235] hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235]"
           >
-            {status === 'Published' ? 'Update & Publish' : 'Update Draft'}
+            {status === 'published' ? 'Update & Publish' : 'Update Draft'}
           </button>
         </div>
       </form>
     </Layout>
-  );
-};
+  )
+}
 
-export default EditPost;
+export default EditPost
