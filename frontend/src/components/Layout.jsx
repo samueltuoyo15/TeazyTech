@@ -44,7 +44,7 @@ const Layout = ({ children, title }) => {
 
       {/* Sidebar */}
       <div className={`
-        lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col
+        z-50 lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col
         fixed inset-y-0 flex w-64 flex-col transform
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 transition-transform duration-300 ease-in-out
@@ -60,6 +60,7 @@ const Layout = ({ children, title }) => {
                 return (
                   <Link
                     key={item.name}
+                    reloadDocument={item.href === '/dashboard'} 
                     to={item.href}
                     className={`
                       group flex items-center px-2 py-2 text-sm font-medium rounded-md

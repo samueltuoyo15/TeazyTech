@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useAuth } from '../Context/AuthContext';
 import { 
@@ -10,10 +10,49 @@ import {
   Calendar 
 } from 'lucide-react';
 import { mockBlogStats } from '../data/mockData';
+import axios from "axios"
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { recentPosts, postsByCategory, viewsOverTime } = mockBlogStats;
+  const [recentPosts, setRecentPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { postsByCategory, viewsOverTime } = mockBlogStats;
+
+  const getCategoryCounts = () => {
+    const counts = {};
+    recentPosts.forEach(post => {
+      counts[post.category] = (counts[post.category] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, count]) => ({ name, count }));
+  };
+
+  const categoryPosts = getCategoryCounts();
+ 
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/admin/posts', {
+          withCredentials: true
+        });
+        setRecentPosts(response.data);
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+  
+  if (loading) {
+    return (
+      <Layout title="Dashboard">
+        <div className="flex justify-center items-center h-64">
+          <p>Loading...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Dashboard">
@@ -42,7 +81,7 @@ const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Categories</p>
-              <p className="text-2xl font-semibold text-gray-800">{user?.total_categories}</p>
+              <p className="text-2xl font-semibold text-gray-800">{categoryPosts.length}</p>
             </div>
           </div>
         </div>
@@ -67,14 +106,14 @@ const Dashboard = () => {
           </div>
           <div className="p-6">
             <ul className="divide-y divide-gray-200">
-              {recentPosts.map((post, index) => (
-                <li key={index} className="py-4 first:pt-0 last:pb-0">
+              {recentPosts.map((post) => (
+                <li key={post?.id} className="py-4 first:pt-0 last:pb-0">
                   <div className="flex items-center">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-gray-900 truncate">{post.title}</p>
                       <div className="flex items-center mt-1">
                         <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                        <p className="text-xs text-gray-500">{post.date}</p>
+                        <p className="text-xs text-gray-500"> {new Date(post.published_date).toLocaleDateString()}</p>
                         <span className="mx-2 text-gray-300">•</span>
                         <Tag className="h-4 w-4 text-gray-400 mr-1" />
                         <p className="text-xs text-gray-500">{post.category}</p>
@@ -82,7 +121,7 @@ const Dashboard = () => {
                     </div>
                     <div className="ml-4 flex-shrink-0">
                       <span className={`px-2 py-1 text-xs rounded-full ${
-                        post.status === 'Published' 
+                        post.status === 'published' 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
@@ -103,11 +142,11 @@ const Dashboard = () => {
           </div>
           <div className="p-6">
             <ul className="space-y-4">
-              {postsByCategory.map((category, index) => (
-                <li key={index}>
+              {categoryPosts.map((category) => (
+                <li key={category.name}>
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-medium text-gray-600">{category.name}</span>
-                    <span className="text-sm text-gray-500">{category.count} posts</span>
+                    <span className="text-sm font-medium text-gray-600 capitalize">{category.name}</span>
+                    <span className="text-sm text-gray-500">{category.count} {category.count === 1 ? 'post' : 'posts'}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div 

@@ -51,13 +51,13 @@ const CreatePost = () => {
     
     if(response.status === 201) {
     alert(`Post "${title}" created successfully!`);
-    navigate('/posts');
+    navigate('/posts', { replace: true, reloadDocument: true })
     return 
     }
     
     throw new Error(response.data?.error)
   } catch(error) {
-  console.error("Post creation error:", error);
+   console.error("Post creation error:", error);
  
   if (error.response?.data?.errors) {
     const backendErrors = error.response.data.errors.reduce((acc, err) => {

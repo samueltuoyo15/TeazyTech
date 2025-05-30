@@ -25,7 +25,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`/api/admin/posts/${id}`, {
+        const response = await axios.get(`http://localhost:5000/api/admin/posts/${id}`, {
           withCredentials: true
         })
         
@@ -77,7 +77,7 @@ const EditPost = () => {
     if (!validateForm()) return
     
     try {
-      const response = await axios.put(`/api/admin/posts/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/admin/posts/${id}`, {
         title,
         excerpt,
         content,
