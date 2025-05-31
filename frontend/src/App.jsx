@@ -8,6 +8,7 @@ import Resources from "./pages/Resources.jsx";
 import Services from "./pages/Services.jsx";
 import Gallery from "./pages/Gallery.jsx";
 import Blog from "./pages/Blog.jsx";
+import ViewBlog from './pages/ViewBlog.jsx';
 import "./App.css";
 
 // Admin imports
@@ -90,6 +91,7 @@ const App = () => {
                                         element={<Gallery />}
                                     />
                                     <Route path="/blog" element={<Blog />} />
+                                    <Route path="/blog/:id" element={<ViewBlog />} />
                                 </Routes>
                             </main>
                             <Footer />

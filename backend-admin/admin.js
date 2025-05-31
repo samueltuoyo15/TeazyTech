@@ -27,6 +27,17 @@ const categorySchema = Joi.object({
   description: Joi.string().max(200).allow("")
 })
 
+const rateLimiter = (req, res, next) => {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 100,
+    message: `Too many requests. Please try again`,
+    standardHeaders: true,  
+    legacyHeaders: false   
+  })
+  return limiter(req, res, next)
+}
+
 const getClientIp = (req) => {
   return req.ip || req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
 }
@@ -69,6 +80,7 @@ const corsOptions = {
 
 app.use(helmet())
 app.use(cors(corsOptions))
+app.use(rateLimiter)
 app.options('/*', cors(corsOptions))
 
 app.use((req, res, next) => {
@@ -124,16 +136,6 @@ const updateUserStats = async (userId, amount) => {
   })
 }
 
-const rateLimiter = (req, res, next) => {
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100,
-    message: `Too many requests. Please try again`,
-    standardHeaders: true,  
-    legacyHeaders: false   
-  })
-  return limiter(req, res, next)
-}
 
 app.post("/api/admin/login", rateLimiter, async (req, res) => {
   const { email, password } = req.body
