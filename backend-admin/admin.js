@@ -185,7 +185,6 @@ app.post("/api/admin/login", rateLimiter, async (req, res) => {
       sameSite: "none",
       partitioned: true  
     })
-
     return res.json({  
       uid: user.uid,  
       email: user.email,  
