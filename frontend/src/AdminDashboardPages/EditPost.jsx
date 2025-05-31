@@ -15,17 +15,32 @@ const EditPost = () => {
   const [category, setCategory] = useState('')
   const [thumbnail, setThumbnail] = useState('')
   const [thumbnailPreview, setThumbnailPreview] = useState('')
-  const [publishDate, setPublishDate] = useState('')
   const [status, setStatus] = useState('draft')
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   
-  const categories = ['tech', 'general', 'business', 'entertainment', 'health']
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`, {
+          withCredentials: true
+        });
+        setCategories(response.data.map(cat => cat.name));
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/admin/posts/${id}`, {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`, {
           withCredentials: true
         })
         
@@ -64,8 +79,13 @@ const EditPost = () => {
     
     if (!title.trim()) newErrors.title = 'Title is required'
     if (!content.trim()) newErrors.content = 'Content is required'
-    if (!category) newErrors.category = 'Category is required'
-    if (!publishDate) newErrors.publishDate = 'Publish date is required'
+    if (!category) {
+      if (categories.length === 0) {
+        newErrors.category = 'No categories available. Please add categories first.';
+      } else {
+        newErrors.category = 'Category is required';
+      }
+    }
     
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -74,17 +94,22 @@ const EditPost = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!validateForm()) return
-    
+    if (!validateForm()) {
+      if (categories.length === 0) {
+        alert("No categories available. Please add categories before creating posts.");
+        navigate('/categories');
+      }
+      return
+    }
     try {
-      const response = await axios.put(`http://localhost:5000/api/admin/posts/${id}`, {
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`, {
         title,
         excerpt,
         content,
         category,
         thumbnail,
         status,
-        published_date: publishDate
+        published_date: new Date().toISOString()
       }, {
         withCredentials: true
       })
@@ -195,47 +220,39 @@ const EditPost = () => {
               <h3 className="text-lg font-medium">Post Settings</h3>
             </div>
             <div className="p-6">
-              <div className="mb-6">
+            <div className="mb-6">
                 <label htmlFor="category" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <Tag className="h-4 w-4 mr-1" />
                   Category <span className="text-red-500 ml-1">*</span>
                 </label>
-                <select
-                  id="category"
-                  className={`w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((cat, index) => (
-                    <option key={index} value={cat}>{cat}</option>
-                  ))}
-                </select>
-                {errors.category && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    {errors.category}
-                  </p>
-                )}
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="publishDate" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Publish Date <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="publishDate"
-                  className={`w-full px-3 py-2 border ${errors.publishDate ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
-                  value={publishDate}
-                  onChange={(e) => setPublishDate(e.target.value)}
-                />
-                {errors.publishDate && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    {errors.publishDate}
-                  </p>
+                {loadingCategories ? (
+                  <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
+                ) : (
+                  <>
+                    <select
+                      id="category"
+                      className={`w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      disabled={categories.length === 0}
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((cat, index) => (
+                        <option key={index} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    {categories.length === 0 && (
+                      <p className="mt-2 text-sm text-yellow-600">
+                        No categories available. Please <a href="/categories" className="text-[#e94235] underline">add categories</a> first.
+                      </p>
+                    )}
+                    {errors.category && (
+                      <p className="mt-1 text-sm text-red-600 flex items-center">
+                        <AlertTriangle className="h-4 w-4 mr-1" />
+                        {errors.category}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
 

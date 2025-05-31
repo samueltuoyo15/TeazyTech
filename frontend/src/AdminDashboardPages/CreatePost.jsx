@@ -13,13 +13,26 @@ const CreatePost = () => {
   const [category, setCategory] = useState('');
   const [thumbnail, setThumbnail] = useState('');
   const [thumbnailPreview, setThumbnailPreview] = useState('');
-  const [publishDate, setPublishDate] = useState(new Date().toISOString().split('T')[0]);
   const [status, setStatus] = useState('draft');
   const [errors, setErrors] = useState({});
-  
-  const categories = [
-   'tech', 'general', 'business', 'entertainment', 'health'
-  ];
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`, {
+          withCredentials: true
+        });
+        setCategories(response.data.map(cat => cat.name));
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleThumbnailChange = (e) => {
     const url = e.target.value;
@@ -32,9 +45,14 @@ const CreatePost = () => {
     
     if (!title.trim()) newErrors.title = 'Title is required';
     if (!content.trim()) newErrors.content = 'Content is required';
-    if (!category) newErrors.category = 'Category is required';
-    if (!publishDate) newErrors.publishDate = 'Publish date is required';
-    
+    if (!category) {
+      if (categories.length === 0) {
+        newErrors.category = 'No categories available. Please add categories first.';
+      } else {
+        newErrors.category = 'Category is required';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -42,39 +60,43 @@ const CreatePost = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-    
-    try {
-    const response = await axios.post("http://localhost:5000/api/admin/create-post", {
-      title, excerpt, content, category, thumbnail, status, published_date: publishDate
-    }, { withCredentials: true })
-    
-    if(response.status === 201) {
-    alert(`Post "${title}" created successfully!`);
-    navigate('/posts', { replace: true, reloadDocument: true })
-    return 
+    if (!validateForm()) {
+      if (categories.length === 0) {
+        alert("No categories available. Please add categories before creating posts.");
+        navigate('/categories');
+      }
+      return;
     }
     
-    throw new Error(response.data?.error)
-  } catch(error) {
-   console.error("Post creation error:", error);
- 
-  if (error.response?.data?.errors) {
-    const backendErrors = error.response.data.errors.reduce((acc, err) => {
-      acc[err.field] = err.message;
-      return acc;
-    }, {});
-    setErrors(backendErrors);
-  } 
-
-  else {
-    alert(
-      error.response?.data?.error || 
-      error.response?.data?.message || 
-      "Failed to create post. Check console for details."
-    );
-  }
-}
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/create-post`, {
+        title, excerpt, content, category, thumbnail, status, published_date: new Date().toISOString()
+      }, { withCredentials: true })
+      
+      if(response.status === 201) {
+        alert(`Post "${title}" created successfully!`);
+        navigate('/posts', { replace: true, reloadDocument: true })
+        return 
+      }
+      
+      throw new Error(response.data?.error)
+    } catch(error) {
+      console.error("Post creation error:", error);
+    
+      if (error.response?.data?.errors) {
+        const backendErrors = error.response.data.errors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
+        setErrors(backendErrors);
+      } else {
+        alert(
+          error.response?.data?.error || 
+          error.response?.data?.message || 
+          "Failed to create post. Check console for details."
+        );
+      }
+    }
   };
 
   return (
@@ -85,7 +107,6 @@ const CreatePost = () => {
             <h3 className="text-lg font-medium">Post Details</h3>
           </div>
           <div className="p-6">
-            {/* Title */}
             <div className="mb-6">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                 Title <span className="text-red-500">*</span>
@@ -106,7 +127,6 @@ const CreatePost = () => {
               )}
             </div>
 
-            {/* Excerpt */}
             <div className="mb-6">
               <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 mb-1">
                 Excerpt
@@ -121,7 +141,6 @@ const CreatePost = () => {
               ></textarea>
             </div>
 
-            {/* Content */}
             <div className="mb-6">
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
                 Content <span className="text-red-500">*</span>
@@ -143,59 +162,47 @@ const CreatePost = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Post Settings */}
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Post Settings</h3>
             </div>
             <div className="p-6">
-              {/* Category */}
               <div className="mb-6">
                 <label htmlFor="category" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <Tag className="h-4 w-4 mr-1" />
                   Category <span className="text-red-500 ml-1">*</span>
                 </label>
-                <select
-                  id="category"
-                  className={`w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((cat, index) => (
-                    <option key={index} value={cat}>{cat}</option>
-                  ))}
-                </select>
-                {errors.category && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    {errors.category}
-                  </p>
+                {loadingCategories ? (
+                  <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
+                ) : (
+                  <>
+                    <select
+                      id="category"
+                      className={`w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      disabled={categories.length === 0}
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((cat, index) => (
+                        <option key={index} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    {categories.length === 0 && (
+                      <p className="mt-2 text-sm text-yellow-600">
+                        No categories available. Please <a href="/categories" className="text-[#e94235] underline">add categories</a> first.
+                      </p>
+                    )}
+                    {errors.category && (
+                      <p className="mt-1 text-sm text-red-600 flex items-center">
+                        <AlertTriangle className="h-4 w-4 mr-1" />
+                        {errors.category}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
 
-              {/* Publish Date */}
-              <div className="mb-6">
-                <label htmlFor="publishDate" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Publish Date <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="publishDate"
-                  className={`w-full px-3 py-2 border ${errors.publishDate ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
-                  value={publishDate}
-                  onChange={(e) => setPublishDate(e.target.value)}
-                />
-                {errors.publishDate && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    {errors.publishDate}
-                  </p>
-                )}
-              </div>
-
-              {/* Status */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -232,7 +239,6 @@ const CreatePost = () => {
             </div>
           </div>
 
-          {/* Featured Image */}
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Featured Image</h3>
@@ -287,7 +293,6 @@ const CreatePost = () => {
           </div>
         </div>
 
-        {/* Form Actions */}
         <div className="flex items-center justify-end space-x-4">
           <button
             type="button"
@@ -299,6 +304,7 @@ const CreatePost = () => {
           <button
             type="submit"
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#e94235] hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235]"
+            disabled={categories.length === 0}
           >
             {status === 'published' ? 'Publish Post' : 'Save Draft'}
           </button>

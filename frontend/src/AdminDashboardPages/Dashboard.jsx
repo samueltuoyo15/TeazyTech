@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useAuth } from '../Context/AuthContext';
-import {  FileText, Tag, Clock, Eye, BarChart3,Calendar } from 'lucide-react';
+import { FileText, Tag, Clock, Eye, BarChart3, Calendar } from 'lucide-react';
 import axios from "axios";
 
 const Dashboard = () => {
@@ -23,11 +23,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admin/posts', {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`, {
           withCredentials: true
         });
         setRecentPosts(response.data);
-           const activities = [
+        const activities = [
           ...response.data.slice(0, 3).map(post => ({
             type: 'post',
             icon: <FileText className="w-3 h-3 text-blue-800" />,
@@ -42,7 +42,7 @@ const Dashboard = () => {
             color: 'green',
             title: 'Categories updated',
             description: `${getCategoryCounts().length} active categories`,
-            timeAgo: "3 days ago"
+            timeAgo: ""
           },
           {
             type: 'views',
@@ -50,10 +50,9 @@ const Dashboard = () => {
             color: 'purple',
             title: 'Blog traffic',
             description: `Total views: ${user?.total_views || 0}`,
-            timeAgo: "1 day ago"
+            timeAgo: ""
           }
         ];
-        
         setRecentActivities(activities.sort((a, b) => new Date(b.date) - new Date(a.date)));
       } catch (err) {
         console.error('Error fetching posts:', err);
@@ -81,7 +80,6 @@ const Dashboard = () => {
         <p className="text-gray-600">Here's what's happening with your blog today.</p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
@@ -119,94 +117,115 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Recent Posts */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 bg-[#e94235] text-white">
             <h3 className="text-lg font-medium">Recent Posts</h3>
           </div>
           <div className="p-6">
-            <ul className="divide-y divide-gray-200">
-              {recentPosts.map((post) => (
-                <li key={post?.id} className="py-4 first:pt-0 last:pb-0">
-                  <div className="flex items-center">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{post.title}</p>
-                      <div className="flex items-center mt-1">
-                        <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                        <p className="text-xs text-gray-500"> {new Date(post.published_date).toLocaleDateString()}</p>
-                        <span className="mx-2 text-gray-300">•</span>
-                        <Tag className="h-4 w-4 text-gray-400 mr-1" />
-                        <p className="text-xs text-gray-500">{post.category}</p>
+            {recentPosts.length > 0 ? (
+              <ul className="divide-y divide-gray-200">
+                {recentPosts.map((post) => (
+                  <li key={post?.id} className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-center">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900 truncate">{post.title}</p>
+                        <div className="flex items-center mt-1">
+                          <Calendar className="h-4 w-4 text-gray-400 mr-1" />
+                          <p className="text-xs text-gray-500"> {new Date(post.published_date).toLocaleDateString()}</p>
+                          <span className="mx-2 text-gray-300">•</span>
+                          <Tag className="h-4 w-4 text-gray-400 mr-1" />
+                          <p className="text-xs text-gray-500">{post.category}</p>
+                        </div>
+                      </div>
+                      <div className="ml-4 flex-shrink-0">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          post.status === 'published' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {post.status}
+                        </span>
                       </div>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        post.status === 'published' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {post.status}
-                      </span>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-center py-8">
+                <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No posts yet</h3>
+                <p className="mt-1 text-sm text-gray-500">What are you waiting for {user?.name}? Create your first post!</p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Categories Distribution */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 bg-[#e94235] text-white">
             <h3 className="text-lg font-medium">Posts by Category</h3>
           </div>
           <div className="p-6">
-            <ul className="space-y-4">
-              {categoryPosts.map((category) => (
-                <li key={category.name}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-medium text-gray-600 capitalize">{category.name}</span>
-                    <span className="text-sm text-gray-500">{category.count} {category.count === 1 ? 'post' : 'posts'}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-[#e94235] h-2.5 rounded-full" 
-                      style={{ width: `${(category.count / user?.total_posts) * 100}%` }}
-                    ></div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {categoryPosts.length > 0 ? (
+              <ul className="space-y-4">
+                {categoryPosts.map((category) => (
+                  <li key={category.name}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-600 capitalize">{category.name}</span>
+                      <span className="text-sm text-gray-500">{category.count} {category.count === 1 ? 'post' : 'posts'}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-[#e94235] h-2.5 rounded-full" 
+                        style={{ width: `${(category.count / user?.total_posts) * 100}%` }}
+                      ></div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-center py-8">
+                <Tag className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No categories yet</h3>
+                <p className="mt-1 text-sm text-gray-500">Hey {user?.name}, add some categories to organize your posts!</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Activity Timeline */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 bg-[#e94235] text-white">
           <h3 className="text-lg font-medium">Recent Activity</h3>
         </div>
         <div className="p-6">
-          <ol className="border-l border-gray-200">
-            {recentActivities.map((activity, index) => (
-              <li key={index} className="mb-6 ml-6">
-                <span className={`absolute flex items-center justify-center w-6 h-6 bg-${activity.color}-100 rounded-full -left-3 ring-8 ring-white`}>
-                  {activity.icon}
-                </span>
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="justify-between items-center mb-3 sm:flex">
-                    <time className="mb-1 text-xs font-normal text-gray-500 sm:order-last sm:mb-0">
-                      {activity.timeAgo}
-                    </time>
-                    <div className="text-sm font-semibold text-gray-900">{activity.title}</div>
+          {recentActivities.length > 0 ? (
+            <ol className="border-l border-gray-200">
+              {recentActivities.map((activity, index) => (
+                <li key={index} className="mb-6 ml-6">
+                  <span className={`absolute flex items-center justify-center w-6 h-6 bg-${activity.color}-100 rounded-full -left-3 ring-8 ring-white`}>
+                    {activity.icon}
+                  </span>
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="justify-between items-center mb-3 sm:flex">
+                      <time className="mb-1 text-xs font-normal text-gray-500 sm:order-last sm:mb-0">
+                        {activity.timeAgo}
+                      </time>
+                      <div className="text-sm font-semibold text-gray-900">{activity.title}</div>
+                    </div>
+                    <div className="text-sm font-normal text-gray-600">
+                      {activity.description}
+                    </div>
                   </div>
-                  <div className="text-sm font-normal text-gray-600">
-                    {activity.description}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="text-center py-8">
+              <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No activity yet</h3>
+              <p className="mt-1 text-sm text-gray-500">Get started by creating posts and categories</p>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

@@ -1,52 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { PlusCircle, Edit2, Trash2, Save, X, Tag } from 'lucide-react';
-import { mockCategories } from '../data/mockData';
+import axios from 'axios';
+import { useAuth } from '../Context/AuthContext';
 
 const Categories = () => {
-  const [categories, setCategories] = useState([
-    {
-      id: 'cat-1',
-      name: 'Tools',
-      description: 'Educational technology tools and software',
-      postCount: 5
-    },
-    {
-      id: 'cat-2', 
-      name: 'Teaching Strategies',
-      description: 'Effective teaching methods and approaches',
-      postCount: 3
-    },
-    {
-      id: 'cat-3',
-      name: 'Accessibility',
-      description: 'Making education accessible for all learners',
-      postCount: 2
-    },
-    {
-      id: 'cat-4',
-      name: 'Trends',
-      description: 'Latest trends in educational technology',
-      postCount: 4
-    },
-    {
-      id: 'cat-5',
-      name: 'Digital Literacy',
-      description: 'Skills for the digital age',
-      postCount: 3
-    },
-    {
-      id: 'cat-6',
-      name: 'Wellbeing',
-      description: 'Student and teacher wellbeing in education',
-      postCount: 2
-    }
-  ]);
+  const { user } = useAuth();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [newCategory, setNewCategory] = useState({ name: '', description: '' });
   const [editedCategory, setEditedCategory] = useState({ name: '', description: '' });
   const [isAdding, setIsAdding] = useState(false);
   
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`, {
+          withCredentials: true
+        });
+        setCategories(response.data);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const startEditing = (category) => {
     setEditingId(category.id);
     setEditedCategory({
@@ -59,20 +41,37 @@ const Categories = () => {
     setEditingId(null);
   };
 
-  const saveEdit = (id) => {
+  const saveEdit = async (id) => {
     if (!editedCategory.name.trim()) return;
     
-    setCategories(categories.map(cat => 
-      cat.id === id 
-        ? { ...cat, name: editedCategory.name, description: editedCategory.description } 
-        : cat
-    ));
-    setEditingId(null);
+    try {
+      await axios.put(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories/${id}`, 
+        editedCategory,
+        { withCredentials: true }
+      );
+      
+      setCategories(categories.map(cat => 
+        cat.id === id 
+          ? { ...cat, ...editedCategory } 
+          : cat
+      ));
+      setEditingId(null);
+    } catch (err) {
+      console.error('Error updating category:', err);
+    }
   };
 
-  const deleteCategory = (id) => {
+  const deleteCategory = async (id) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
-      setCategories(categories.filter(cat => cat.id !== id));
+      try {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories/${id}`, {
+          withCredentials: true
+        });
+        setCategories(categories.filter(cat => cat.id !== id));
+      } catch (err) {
+        console.error('Error deleting category:', err);
+        alert('Cannot delete category with posts');
+      }
     }
   };
 
@@ -85,21 +84,31 @@ const Categories = () => {
     setIsAdding(false);
   };
 
-  const addCategory = () => {
+  const addCategory = async () => {
     if (!newCategory.name.trim()) return;
     
-    const newId = `cat-${Date.now()}`;
-    setCategories([
-      ...categories,
-      {
-        id: newId,
-        name: newCategory.name,
-        description: newCategory.description,
-        postCount: 0,
-      }
-    ]);
-    setIsAdding(false);
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`,
+        newCategory,
+        { withCredentials: true }
+      );
+      
+      setCategories([...categories, response.data]);
+      setIsAdding(false);
+    } catch (err) {
+      console.error('Error adding category:', err);
+    }
   };
+
+  if (loading) {
+    return (
+      <Layout title="Manage Categories">
+        <div className="flex justify-center items-center h-64">
+          <p>Loading categories...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Manage Categories">
@@ -208,7 +217,7 @@ const Categories = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {category.postCount} posts
+                      {category.postCount || 0} posts
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -249,7 +258,7 @@ const Categories = () => {
                 </tr>
               ))}
 
-              {categories.length === 0 && !isAdding && (
+              {categories.length === 0 && !isAdding && !loading && (
                 <tr>
                   <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
                     No categories found. Click "Add Category" to create one.

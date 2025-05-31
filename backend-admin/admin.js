@@ -8,15 +8,27 @@ import cors from "cors"
 import pino from "pino"
 import Joi from "joi"
 
-const postSchema = Joi.object({
+postSchema = Joi.object({
   title: Joi.string().required().min(1).max(100),
-  excerpt: Joi.string().required().min(1).max(200),
+  excerpt: Joi.string().required().min(1).max(200).optional(),
   content: Joi.string().required().min(1),
-  category: Joi.string().valid("tech", "general", "business", "entertainment", "health").required(),
+  category: Joi.string().min(2).max(30).required(),
   published_date: Joi.date().iso(),
   status: Joi.string().valid("draft", "published").required(),
-  thumbnail: Joi.string().uri().required()
+  thumbnail: Joi.string().uri().optional(),
+  views: Joi.number().default(0),
+  viewedIPs: Joi.array().items(Joi.string()).default([])
 })
+
+const categorySchema = Joi.object({
+  name: Joi.string().required().min(2).max(50),
+  description: Joi.string().max(200).allow("")
+})
+
+const getClientIp = (req) => {
+  return req.ip ||req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
+}
+
 
 const logger = pino({
   transport: { target: "pino-pretty" },
@@ -25,7 +37,7 @@ const logger = pino({
 
 const app = express()
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: process.env.FRONTEND_DOMAIN,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -54,13 +66,13 @@ if (!FIREBASE_API_KEY) {
 }
 
 const updateUserStats = async (userId, amount) => {
-  const userRef = db.collection("user").doc(userId)
+  const adminRef = db.collection("user").doc(userId)
   await db.runTransaction(async (transaction) => {
-    const userDoc = await transaction.get(userRef)
-    if (!userDoc.exists) throw new Error("User document not found")
+    const adminDoc = await transaction.get(adminRef)
+    if (!adminDoc.exists) throw new Error("User document not found")
 
-    const currentTotal = userDoc.data().total_posts || 0  
-    transaction.update(userRef, {  
+    const currentTotal = adminDoc.data().total_posts || 0  
+    transaction.update(adminRef, {  
       total_posts: currentTotal + amount  
     })
   })
@@ -98,8 +110,8 @@ app.post("/api/admin/login", async (req, res) => {
       })  
     }  
 
-    const userDoc = await db.collection("user").doc(user.uid).get()  
-    if (!userDoc.exists) {  
+    const adminDoc = await db.collection("user").doc(user.uid).get()  
+    if (!adminDoc.exists) {  
       logger.error("Missing user document", { uid: user.uid })  
       return res.status(404).json({  
         error: "User document not found",  
@@ -107,7 +119,7 @@ app.post("/api/admin/login", async (req, res) => {
       })  
     }  
 
-    const userData = userDoc.data()  
+    const userData = adminDoc.data()  
     res.cookie("accessToken", data.idToken, {  
       httpOnly: true,  
       secure: process.env.NODE_ENV === "production",  
@@ -137,16 +149,16 @@ app.get("/api/admin/me", async (req, res) => {
   try {
     const decoded = await admin.auth().verifyIdToken(token)
     const user = await admin.auth().getUser(decoded.uid)
-    const userDoc = await db.collection("user").doc(user.uid).get()
+    const adminDoc = await db.collection("user").doc(user.uid).get()
 
-    if (!userDoc.exists) {  
+    if (!adminDoc.exists) {  
       return res.status(404).json({ error: "User document not found" })  
     }  
 
     return res.json({  
       uid: user.uid,  
       email: user.email,  
-      ...userDoc.data()  
+      ...adminDoc.data()  
     })
   } catch (error) {
     logger.error("ME endpoint failed", error)
@@ -223,16 +235,8 @@ app.post("/api/admin/create-post", async (req, res) => {
 })
 
 app.get("/api/admin/posts", async (req, res) => {
-  const token = req.cookies.accessToken
-  if (!token) return res.status(401).json({ error: "Unauthorized" })
-
   try {
-    const decoded = await admin.auth().verifyIdToken(token)
-    const user = await admin.auth().getUser(decoded.uid)
-    const isAdmin = user.customClaims?.admin === true
-
-    if (!isAdmin) return res.status(403).json({ error: "Admin access required" }) 
-    const postsSnapshot = await db.collection("posts").orderBy("updated_at", "desc").get()  
+   const postsSnapshot = await db.collection("posts").orderBy("updated_at", "desc").get()  
     const posts = postsSnapshot.docs.map(doc => {
     const data = doc.data()
     const publishedDate = data.updated_at.toDate()
@@ -287,19 +291,10 @@ app.get("/api/admin/posts", async (req, res) => {
 })
 
 app.get("/api/admin/posts/:postId", async (req, res) => {
-  const token = req.cookies.accessToken
-  const postId = req.params.postId
-
-  if (!token) return res.status(401).json({ error: "Unauthorized" })
-  if (!postId) return res.status(400).json({ error: "Post ID required" })
+ const postId = req.params.postId
+ if (!postId) return res.status(400).json({ error: "Post ID required" })
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token)
-    const user = await admin.auth().getUser(decoded.uid)
-    const isAdmin = user.customClaims?.admin === true
-
-    if (!isAdmin) return res.status(403).json({ error: "Admin access required" })  
-
     const postRef = db.collection("posts").doc(postId)  
     const postDoc = await postRef.get()  
 
@@ -308,6 +303,7 @@ app.get("/api/admin/posts/:postId", async (req, res) => {
     const postData = postDoc.data()  
     return res.json({  
       id: postId,  
+      views: postData.views || 0,
       ...postData  
     })
   } catch (error) {
@@ -394,7 +390,9 @@ app.delete("/api/admin/posts/:postId", async (req, res) => {
     if (!postDoc.exists) return res.status(404).json({ error: "Post not found" })  
 
     await postRef.delete()  
-    await updateUserStats(user.uid, -1)  
+    if (userStats.postCount > 0) {
+     await updateUserStats(user.uid, -1)
+   }
     
     return res.json({   
       message: "Post deleted successfully",  
@@ -425,6 +423,208 @@ app.get("/api/admin/posts/category-counts", async (req, res) => {
     res.json(Object.entries(counts).map(([name, count]) => ({ name, count })))
   } catch (error) {
     res.status(500).json({ error: "Failed to get category counts" })
+  }
+})
+
+app.get("/api/admin/categories", async (req, res) => {
+  const token = req.cookies.accessToken
+  if (!token) return res.status(401).json({ error: "Unauthorized" })
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token)
+    const user = await admin.auth().getUser(decoded.uid)
+    if (!user.customClaims?.admin) return res.status(403).json({ error: "Admin access required" })
+
+    const categoriesSnapshot = await db.collection("categories").get()
+    const postsSnapshot = await db.collection("posts").get()
+    
+    const postCounts = {}
+    postsSnapshot.forEach(doc => {
+      const category = doc.data().category
+      postCounts[category] = (postCounts[category] || 0) + 1
+    })
+
+    const categories = categoriesSnapshot.docs.map(doc => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        name: data.name,
+        description: data.description || "",
+        postCount: postCounts[data.name] || 0
+      }
+    })
+
+    res.json(categories)
+  } catch (error) {
+    logger.error("Failed to fetch categories:", error)
+    res.status(500).json({ error: "Failed to fetch categories" })
+  }
+})
+
+app.post("/api/admin/categories", async (req, res) => {
+  const token = req.cookies.accessToken
+  if (!token) return res.status(401).json({ error: "Unauthorized" })
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token)
+    const user = await admin.auth().getUser(decoded.uid)
+    if (!user.customClaims?.admin) return res.status(403).json({ error: "Admin access required" })
+
+    const { error, value } = categorySchema.validate(req.body)
+    if (error) return res.status(400).json({ error: error.details[0].message })
+
+    const existingCat = await db.collection("categories").where("name", "==", value.name).limit(1).get()
+
+    if (!existingCat.empty) {
+      return res.status(400).json({ error: "Category already exists" })
+    }
+
+    const docRef = await db.collection("categories").add({
+      name: value.name,
+      description: value.description,
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    })
+
+    res.status(201).json({ 
+      id: docRef.id,
+      name: value.name,
+      description: value.description,
+      postCount: 0
+    })
+  } catch (error) {
+    logger.error("Failed to create category:", error)
+    res.status(500).json({ error: "Failed to create category" })
+  }
+})
+
+app.put("/api/admin/categories/:id", async (req, res) => {
+  const token = req.cookies.accessToken
+  if (!token) return res.status(401).json({ error: "Unauthorized" })
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token)
+    const user = await admin.auth().getUser(decoded.uid)
+    if (!user.customClaims?.admin) return res.status(403).json({ error: "Admin access required" })
+
+    const { error, value } = categorySchema.validate(req.body)
+    if (error) return res.status(400).json({ error: error.details[0].message })
+
+    const categoryId = req.params.id
+    const categoryRef = db.collection("categories").doc(categoryId)
+    const categoryDoc = await categoryRef.get()
+
+    if (!categoryDoc.exists) {
+      return res.status(404).json({ error: "Category not found" })
+    }
+
+    await categoryRef.update({
+      name: value.name,
+      description: value.description,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    })
+
+    const postsSnapshot = await db.collection("posts").where("category", "==", value.name).get()
+
+    res.json({
+      id: categoryId,
+      name: value.name,
+      description: value.description,
+      postCount: postsSnapshot.size
+    })
+  } catch (error) {
+    logger.error("Failed to update category:", error)
+    res.status(500).json({ error: "Failed to update category" })
+  }
+})
+
+app.delete("/api/admin/categories/:id", async (req, res) => {
+  const token = req.cookies.accessToken
+  if (!token) return res.status(401).json({ error: "Unauthorized" })
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token)
+    const user = await admin.auth().getUser(decoded.uid)
+    if (!user.customClaims?.admin) return res.status(403).json({ error: "Admin access required" })
+
+    const categoryId = req.params.id
+    const categoryRef = db.collection("categories").doc(categoryId)
+    const categoryDoc = await categoryRef.get()
+
+    if (!categoryDoc.exists) {
+      return res.status(404).json({ error: "Category not found" })
+    }
+
+    const categoryName = categoryDoc.data().name
+    const postsSnapshot = await db.collection("posts").where("category", "==", categoryName).limit(1).get()
+
+    if (!postsSnapshot.empty) {
+      return res.status(400).json({ error: "Cannot delete category with posts" })
+    }
+
+    await categoryRef.delete()
+    res.json({ message: "Category deleted successfully" })
+  } catch (error) {
+    logger.error("Failed to delete category:", error)
+    res.status(500).json({ error: "Failed to delete category" })
+  }
+})
+
+app.post("/api/posts/:id/view", async (req, res) => {
+  try {
+    const postId = req.params.id
+    const clientIp = getClientIp(req)
+    
+    if (!postId) {
+      return res.status(400).json({ error: 'Post ID is required' })
+    }
+
+    const postRef = db.collection("posts").doc(postId)
+    
+    await db.runTransaction(async (transaction) => {
+      const postDoc = await transaction.get(postRef)
+      
+      if (!postDoc.exists) {
+        throw new Error('Post not found')
+      }
+      
+      const postData = postDoc.data()
+      const viewedIPs = postData.viewedIPs || []
+      
+        if (!viewedIPs.includes(clientIp)) {
+        const newViewCount = (postData.views || 0) + 1
+        
+        transaction.update(postRef, {
+          views: newViewCount,
+          viewedIPs: [...viewedIPs, clientIp],
+          updated_at: admin.firestore.FieldValue.serverTimestamp()
+        })
+
+         const adminId = postData.author_id
+        
+        if (adminId) {
+          const adminRef = db.collection("user").doc(adminId)
+          const adminDoc = await transaction.get(adminRef)
+          
+          if (adminDoc.exists) {
+            const currentTotalViews = adminDoc.data().total_views || 0
+            transaction.update(adminRef, {
+              total_views: currentTotalViews + 1,
+              updated_at: admin.firestore.FieldValue.serverTimestamp()
+            })
+          }
+        }
+      }
+    })
+    
+    return res.json({ success: true })
+    
+  } catch (error) {
+    logger.error('Error tracking post view:', error)
+    return res.status(500).json({ 
+      error: 'Failed to track view',
+      message: error.message 
+    })
   }
 })
 

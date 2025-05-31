@@ -26,7 +26,7 @@ const Posts = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admin/posts', {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`, {
           withCredentials: true
         });
         setPosts(response.data);
@@ -51,7 +51,7 @@ const Posts = () => {
   const handleDelete = async (postId) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/admin/posts/${postId}`, {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${postId}`, {
           withCredentials: true
         });
         setPosts(posts.filter(post => post.id !== postId));
