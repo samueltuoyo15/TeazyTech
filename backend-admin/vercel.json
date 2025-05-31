@@ -9,34 +9,14 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "admin.js"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://teazy-tech-seven.vercel.app"
-        },
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,POST,PUT,DELETE,OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization, X-Requested-With"
-        },
-        {
-          "key": "Access-Control-Expose-Headers",
-          "value": "set-cookie"
-        }
-      ]
+      "dest": "admin.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://teazy-tech-seven.vercel.app",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Expose-Headers": "set-cookie"
+      }
     }
   ]
 }
