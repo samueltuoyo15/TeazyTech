@@ -12,24 +12,52 @@ const ViewBlog = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Track view with proper headers
         try {
-          await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${id}/view`);
+          await axios.post(
+            `${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${id}/view`,
+            {}, // Empty body
+            {
+              headers: {
+                "Content-Type": "application/json"
+              },
+              withCredentials: true
+            }
+          );
         } catch (viewError) {
-          console.error("View tracking failed:", viewError);
-       }
+          console.warn("View tracking failed (non-critical):", {
+            status: viewError.response?.status,
+            message: viewError.message
+          });
+        }
 
+        // Fetch post data
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`
+          `${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`,
+          {
+            timeout: 5000,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
         );
 
-        if (response.data.status !== "published") {
-          throw new Error("Post not found or not published");
+        if (!response.data || response.data.status !== "published") {
+          throw new Error("Post not available");
         }
         
         setPost(response.data);
       } catch (err) {
-        console.error("Error:", err);
-        setError(err.message || "An error occurred while loading the post");
+        console.error("Post loading error:", {
+          message: err.message,
+          response: err.response?.data
+        });
+        
+        setError(
+          err.response?.data?.message || 
+          err.message || 
+          "Failed to load post. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -58,8 +86,14 @@ const ViewBlog = () => {
         <section className="blog-hero">
           <div className="container">
             <div className="blog-hero-content">
-              <h1>Error</h1>
+              <h1>Error Loading Post</h1>
               <p>{error}</p>
+              <button 
+                className="btn btn-accent"
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </button>
             </div>
           </div>
         </section>
@@ -75,6 +109,9 @@ const ViewBlog = () => {
             <div className="blog-hero-content">
               <h1>Post Not Found</h1>
               <p>The requested blog post could not be found.</p>
+              <a href="/blog" className="btn btn-accent">
+                Back to Blog
+              </a>
             </div>
           </div>
         </section>
@@ -103,7 +140,13 @@ const ViewBlog = () => {
             <div className="blog-main">
               <article className="single-blog-post">
                 <div className="single-post-image">
-                  <img src={post.thumbnail} alt={post.title} />
+                  <img 
+                    src={post.thumbnail} 
+                    alt={post.title}
+                    onError={(e) => {
+                      e.target.src = '/placeholder-image.jpg'; // Fallback image
+                    }}
+                  />
                   <div className="blog-post-category">{post.category}</div>
                 </div>
                 
@@ -112,14 +155,15 @@ const ViewBlog = () => {
                   <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </div>
 
-                <div className="post-tags">
-                  {post.tags &&
-                    post.tags.map((tag, index) => (
+                {post.tags?.length > 0 && (
+                  <div className="post-tags">
+                    {post.tags.map((tag, index) => (
                       <span key={index} className="tag">
                         {tag}
                       </span>
                     ))}
-                </div>
+                  </div>
+                )}
               </article>
             </div>
 
@@ -128,17 +172,16 @@ const ViewBlog = () => {
                 <h3>Categories</h3>
                 <ul className="category-list">
                   <li>
-                    <a href="#">{post.category}</a>
+                    <a href={`/blog?category=${encodeURIComponent(post.category)}`}>
+                      {post.category}
+                    </a>
                   </li>
                 </ul>
               </div>
 
               <div className="sidebar-widget subscribe-widget">
                 <h3>Subscribe</h3>
-                <p>
-                  Get the latest educational technology updates directly to your
-                  inbox.
-                </p>
+                <p>Get updates directly to your inbox</p>
                 <form className="subscribe-form">
                   <input
                     type="email"
@@ -159,7 +202,7 @@ const ViewBlog = () => {
         <div className="container">
           <div className="blog-cta-content text-center">
             <h2>Enjoyed This Article?</h2>
-            <p>Explore more insights and tips in our blog collection.</p>
+            <p>Explore more insights in our blog collection</p>
             <a href="/blog" className="btn btn-accent">
               Back to Blog
             </a>
