@@ -1,3 +1,4 @@
+import rateLimit from "express-rate-limit"
 import express from "express"
 import admin from "firebase-admin"
 import cookieParser from "cookie-parser"
@@ -6,7 +7,6 @@ import cors from "cors"
 import helmet from "helmet"
 import pino from "pino"
 import Joi from "joi"
-import { rateLimit } from "express-rate-limit"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -27,16 +27,6 @@ const categorySchema = Joi.object({
   description: Joi.string().max(200).allow("")
 })
 
-const rateLimiter = (req, res, next) => {
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100,
-    message: `Too many requests. Please try again`,
-    standardHeaders: true,  
-    legacyHeaders: false   
-  })
-  return limiter(req, res, next)
-}
 
 const getClientIp = (req) => {
   return req.ip || req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
@@ -55,6 +45,20 @@ const logger = pino({
 })
 
 const app = express()
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many requests from this IP, please try again later'
+})
+
+const endpointLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: 'Too many view requests'
+})
 
 const allowedOrigins = [
   'https://teazy-tech-seven.vercel.app',
@@ -80,7 +84,7 @@ const corsOptions = {
 
 app.use(helmet())
 app.use(cors(corsOptions))
-app.use(rateLimiter)
+app.use(globalLimiter)
 app.options('/*', cors(corsOptions))
 
 app.use((req, res, next) => {
@@ -137,7 +141,7 @@ const updateUserStats = async (userId, amount) => {
 }
 
 
-app.post("/api/admin/login", rateLimiter, async (req, res) => {
+app.post("/api/admin/login", endpointLimiter, async (req, res) => {
   const { email, password } = req.body
   logger.info("Login attempt", { email })
 
@@ -635,8 +639,8 @@ app.delete("/api/admin/categories/:id", async (req, res) => {
   }
 })
 
-app.post("/api/posts/:id/view", async (req, res) => {
-  logger.info("api view endpoint hit.....")
+app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
+  logger.info("api view endpoint hit.....se")
   try {
     const postId = req.params.id
     logger.info("postId", postId)
