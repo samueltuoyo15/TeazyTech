@@ -69,11 +69,7 @@ const ViewBlog = () => {
           <h1 className="blog-title">{post.title}</h1>
           <div className="blog-meta">
             <span className="publish-date">
-              {new Date(post.published_date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
+             {post.published_date}
             </span>
             <span className="category-tag">{post.category}</span>
             <span className="view-count">{post.views} views</span>
