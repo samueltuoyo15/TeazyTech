@@ -694,7 +694,7 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
 
         if (postData.author_id) {
           console.log('[TRANSACTION] Updating author stats for:', postData.author_id)
-          const adminRef = db.collection("users").doc(postData.author_id)
+          const adminRef = db.collection("user").doc(postData.author_id)
           transaction.update(adminRef, {
             total_views: admin.firestore.FieldValue.increment(1),
             updated_at: admin.firestore.FieldValue.serverTimestamp()
