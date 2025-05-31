@@ -643,13 +643,15 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
   logger.info("api view endpoint hit.....se")
   try {
     const postId = req.params.id
-    logger.info("postId", postId)
-    const clientIp = getClientIp(req)
-    
-    if (!postId) {
+    if(!postId){
       return res.status(400).json({ error: 'Post ID is required' })
     }
-
+    console.log("postId:", postId)
+    const clientIp = getClientIp(req)
+    if (!clientIp) {
+      return res.status(400).json({ error: 'Could not determine client IP' })
+    }
+    console.log("Tracking view for post", { postId, clientIp })
     const postRef = db.collection("posts").doc(postId)
     
     await db.runTransaction(async (transaction) => {
@@ -672,7 +674,11 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
         })
 
          const adminId = postData.author_id
-        
+        console.log("Admin ID for post:", adminId)
+        if (!adminId) {
+          throw new Error('Admin ID not found for post')
+        }
+        console.log("Tracking view for admin", { adminId })
         if (adminId) {
           const adminRef = db.collection("user").doc(adminId)
           const adminDoc = await transaction.get(adminRef)
@@ -688,10 +694,10 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
       }
     })
     
-    return res.json({ success: true })
+    return res.status(200).json({ success: true })
     
   } catch (error) {
-    logger.error('Error tracking post view:', error)
+    console.error('Error tracking post view:', error, error.message)
     return res.status(500).json({ 
       error: 'Failed to track view',
       message: error.message 
