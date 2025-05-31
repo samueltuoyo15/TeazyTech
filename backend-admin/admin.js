@@ -30,8 +30,15 @@ const getClientIp = (req) => {
 }
 
 const logger = pino({
-  transport: { target: "pino-pretty" },
-  level: "debug"
+  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  ...(process.env.NODE_ENV !== 'production' && {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true
+      }
+    }
+  })
 })
 
 const app = express()
