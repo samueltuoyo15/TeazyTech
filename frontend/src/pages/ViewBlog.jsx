@@ -153,15 +153,6 @@ const ViewBlog = () => {
                   <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </div>
 
-                {post.tags?.length > 0 && (
-                  <div className="post-tags">
-                    {post.tags.map((tag, index) => (
-                      <span key={index} className="tag">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </article>
             </div>
 
