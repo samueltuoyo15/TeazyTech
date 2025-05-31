@@ -132,8 +132,8 @@ app.post("/api/admin/login", async (req, res) => {
     secure: true, 
     maxAge: 3600 * 1000,
     path: "/",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",  
-    domain: process.env.NODE_ENV === "production" ?  process.env.COOKIE_DOMAIN : undefined, 
+    domain: ".vercel.app",
+    sameSite: "none"
     partitioned: true  
    })
 
@@ -180,11 +180,12 @@ app.get("/api/admin/me", async (req, res) => {
 
 app.post("/api/admin/logout", (req, res) => {
   res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: true,
-    path: "/",
-    domain: process.env.NODE_ENV === "production" ? process.env.COOKIE_DOMAIN : undefined
-  })
+  httpOnly: true,
+  secure: true,
+  path: "/",
+  domain: ".vercel.app",
+  sameSite: "none"
+})
   return res.json({ message: "Logged out" })
 })
 
