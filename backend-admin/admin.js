@@ -8,7 +8,7 @@ import cors from "cors"
 import pino from "pino"
 import Joi from "joi"
 
-postSchema = Joi.object({
+const postSchema = Joi.object({
   title: Joi.string().required().min(1).max(100),
   excerpt: Joi.string().required().min(1).max(200).optional(),
   content: Joi.string().required().min(1),
@@ -28,7 +28,6 @@ const categorySchema = Joi.object({
 const getClientIp = (req) => {
   return req.ip ||req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
 }
-
 
 const logger = pino({
   transport: { target: "pino-pretty" },
