@@ -640,18 +640,14 @@ app.delete("/api/admin/categories/:id", async (req, res) => {
 })
 
 app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
-  logger.info("api view endpoint hit.....se")
   try {
     const postId = req.params.id
-    if(!postId){
+    const clientIp = getClientIp(req)
+    
+    if (!postId) {
       return res.status(400).json({ error: 'Post ID is required' })
     }
-    console.log("postId:", postId)
-    const clientIp = getClientIp(req)
-    if (!clientIp) {
-      return res.status(400).json({ error: 'Could not determine client IP' })
-    }
-    console.log("Tracking view for post", { postId, clientIp })
+
     const postRef = db.collection("posts").doc(postId)
     
     await db.runTransaction(async (transaction) => {
@@ -662,42 +658,34 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
       }
       
       const postData = postDoc.data()
+      
+      if (postData.status !== "published") {
+        return res.status(403).json({ error: 'Post not published' })
+      }
+
       const viewedIPs = postData.viewedIPs || []
       
-        if (!viewedIPs.includes(clientIp)) {
-        const newViewCount = (postData.views || 0) + 1
-        
+      if (!viewedIPs.includes(clientIp)) {
         transaction.update(postRef, {
-          views: newViewCount,
+          views: (postData.views || 0) + 1,
           viewedIPs: [...viewedIPs, clientIp],
           updated_at: admin.firestore.FieldValue.serverTimestamp()
         })
 
-         const adminId = postData.author_id
-        console.log("Admin ID for post:", adminId)
-        if (!adminId) {
-          throw new Error('Admin ID not found for post')
-        }
-        console.log("Tracking view for admin", { adminId })
-        if (adminId) {
-          const adminRef = db.collection("user").doc(adminId)
-          const adminDoc = await transaction.get(adminRef)
-          
-          if (adminDoc.exists) {
-            const currentTotalViews = adminDoc.data().total_views || 0
-            transaction.update(adminRef, {
-              total_views: currentTotalViews + 1,
-              updated_at: admin.firestore.FieldValue.serverTimestamp()
-            })
-          }
+        if (postData.author_id) {
+          const adminRef = db.collection("users").doc(postData.author_id)
+          transaction.update(adminRef, {
+            total_views: admin.firestore.FieldValue.increment(1),
+            updated_at: admin.firestore.FieldValue.serverTimestamp()
+          })
         }
       }
     })
     
-    return res.status(200).json({ success: true })
+    return res.json({ success: true })
     
   } catch (error) {
-    console.error('Error tracking post view:', error, error.message)
+    logger.error('Error tracking post view:', error)
     return res.status(500).json({ 
       error: 'Failed to track view',
       message: error.message 
@@ -712,6 +700,7 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
   })
 })
+
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))

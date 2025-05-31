@@ -12,11 +12,10 @@ const ViewBlog = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Track view with proper headers
         try {
           await axios.post(
             `${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${id}/view`,
-            {}, // Empty body
+            {}, 
             {
               headers: {
                 "Content-Type": "application/json"
@@ -31,7 +30,6 @@ const ViewBlog = () => {
           });
         }
 
-        // Fetch post data
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`,
           {
