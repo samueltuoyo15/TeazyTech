@@ -640,32 +640,52 @@ app.delete("/api/admin/categories/:id", async (req, res) => {
 })
 
 app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
+  console.log('[VIEW TRACKING] Starting request for post:', req.params.id)
+  
   try {
     const postId = req.params.id
+    console.log('[VIEW TRACKING] Extracted post ID:', postId)
+
     const clientIp = getClientIp(req)
+    console.log('[VIEW TRACKING] Client IP:', clientIp)
     
     if (!postId) {
+      console.error('[VIEW TRACKING] Missing post ID')
       return res.status(400).json({ error: 'Post ID is required' })
     }
 
     const postRef = db.collection("posts").doc(postId)
+    console.log('[VIEW TRACKING] Post reference created')
     
     await db.runTransaction(async (transaction) => {
+      console.log('[TRANSACTION] Starting transaction')
+      
       const postDoc = await transaction.get(postRef)
+      console.log('[TRANSACTION] Post document fetched')
       
       if (!postDoc.exists) {
+        console.error('[TRANSACTION] Post not found in Firestore')
         throw new Error('Post not found')
       }
       
       const postData = postDoc.data()
+      console.log('[TRANSACTION] Post data:', { 
+        status: postData.status, 
+        views: postData.views,
+        hasAuthor: !!postData.author_id
+      })
       
       if (postData.status !== "published") {
+        console.warn('[TRANSACTION] Attempt to view unpublished post')
         return res.status(403).json({ error: 'Post not published' })
       }
 
       const viewedIPs = postData.viewedIPs || []
+      console.log('[TRANSACTION] Existing IPs:', viewedIPs)
       
       if (!viewedIPs.includes(clientIp)) {
+        console.log('[TRANSACTION] New view from IP:', clientIp)
+        
         transaction.update(postRef, {
           views: (postData.views || 0) + 1,
           viewedIPs: [...viewedIPs, clientIp],
@@ -673,22 +693,32 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
         })
 
         if (postData.author_id) {
+          console.log('[TRANSACTION] Updating author stats for:', postData.author_id)
           const adminRef = db.collection("users").doc(postData.author_id)
           transaction.update(adminRef, {
             total_views: admin.firestore.FieldValue.increment(1),
             updated_at: admin.firestore.FieldValue.serverTimestamp()
           })
         }
+      } else {
+        console.log('[TRANSACTION] Duplicate view from IP:', clientIp)
       }
     })
     
+    console.log('[VIEW TRACKING] Successfully completed')
     return res.json({ success: true })
     
   } catch (error) {
-    logger.error('Error tracking post view:', error)
+    console.error('[VIEW TRACKING ERROR] Full error:', {
+      message: error.message,
+      stack: error.stack,
+      postId: req.params?.id,
+      timestamp: new Date().toISOString()
+    })
+    
     return res.status(500).json({ 
       error: 'Failed to track view',
-      message: error.message 
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
     })
   }
 })
