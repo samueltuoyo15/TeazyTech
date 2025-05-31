@@ -1,32 +1,42 @@
-import { useParams } from "react-router-dom"
-import { useState, useEffect } from "react"
-import axios from "axios"
-import "../styles/Blog.css"
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "../styles/Blog.css";
 
 const ViewBlog = () => {
-  const { id } = useParams()
-  const [post, setPost] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`)
-        if (response.data.status !== "published") {
-          throw new Error("Post not found or not published")
-        }
-        setPost(response.data)
-      } catch (err) {
-        console.error("Error fetching post:", err)
-        setError(err.message || "An error occurred while fetching the post")
-      } finally {
-        setLoading(false)
-      }
-    }
+        try {
+          await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${id}/view`);
+        } catch (viewError) {
+          console.error("View tracking failed:", viewError);
+       }
 
-    fetchPost()
-  }, [id])
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`
+        );
+
+        if (response.data.status !== "published") {
+          throw new Error("Post not found or not published");
+        }
+        
+        setPost(response.data);
+      } catch (err) {
+        console.error("Error:", err);
+        setError(err.message || "An error occurred while loading the post");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   if (loading) {
     return (
@@ -39,7 +49,7 @@ const ViewBlog = () => {
           </div>
         </section>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -54,7 +64,7 @@ const ViewBlog = () => {
           </div>
         </section>
       </div>
-    )
+    );
   }
 
   if (!post) {
@@ -69,7 +79,7 @@ const ViewBlog = () => {
           </div>
         </section>
       </div>
-    )
+    );
   }
 
   return (
@@ -103,9 +113,12 @@ const ViewBlog = () => {
                 </div>
 
                 <div className="post-tags">
-                  {post.tags && post.tags.map((tag, index) => (
-                    <span key={index} className="tag">{tag}</span>
-                  ))}
+                  {post.tags &&
+                    post.tags.map((tag, index) => (
+                      <span key={index} className="tag">
+                        {tag}
+                      </span>
+                    ))}
                 </div>
               </article>
             </div>
@@ -122,9 +135,16 @@ const ViewBlog = () => {
 
               <div className="sidebar-widget subscribe-widget">
                 <h3>Subscribe</h3>
-                <p>Get the latest educational technology updates directly to your inbox.</p>
+                <p>
+                  Get the latest educational technology updates directly to your
+                  inbox.
+                </p>
                 <form className="subscribe-form">
-                  <input type="email" placeholder="Your email address" required />
+                  <input
+                    type="email"
+                    placeholder="Your email address"
+                    required
+                  />
                   <button type="submit" className="btn btn-primary">
                     Subscribe
                   </button>
@@ -139,9 +159,7 @@ const ViewBlog = () => {
         <div className="container">
           <div className="blog-cta-content text-center">
             <h2>Enjoyed This Article?</h2>
-            <p>
-              Explore more insights and tips in our blog collection.
-            </p>
+            <p>Explore more insights and tips in our blog collection.</p>
             <a href="/blog" className="btn btn-accent">
               Back to Blog
             </a>
@@ -149,7 +167,7 @@ const ViewBlog = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default ViewBlog
+export default ViewBlog;
