@@ -44,11 +44,12 @@ const logger = pino({
 const app = express()
 app.use(cors({
   origin: process.env.FRONTEND_DOMAIN,
-  credentials: true,
+  credentials: true,  
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "x-requested-with"],
+  exposedHeaders: ["set-cookie"]  
 }))
-
+app.set("trust proxy", 1)  
 app.use(express.json())
 app.use(cookieParser())
 
@@ -126,13 +127,15 @@ app.post("/api/admin/login", async (req, res) => {
     }  
 
     const userData = adminDoc.data()  
-    res.cookie("accessToken", data.idToken, {  
-      httpOnly: true,  
-      secure: process.env.NODE_ENV === "production",  
-      maxAge: 3600 * 1000,  
-      path: "/",  
-      sameSite: "lax"  
-    })  
+    res.cookie("accessToken", data.idToken, {
+    httpOnly: true,
+    secure: true, 
+    maxAge: 3600 * 1000,
+    path: "/",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",  
+    domain: process.env.NODE_ENV === "production" ?  process.env.COOKIE_DOMAIN : undefined, 
+    partitioned: true  
+   })
 
     return res.json({  
       uid: user.uid,  
@@ -176,9 +179,15 @@ app.get("/api/admin/me", async (req, res) => {
 })
 
 app.post("/api/admin/logout", (req, res) => {
-  res.clearCookie("accessToken")
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: true,
+    path: "/",
+    domain: process.env.NODE_ENV === "production" ? process.env.COOKIE_DOMAIN : undefined
+  })
   return res.json({ message: "Logged out" })
 })
+
 
 app.post("/api/admin/create-post", async (req, res) => {
   const token = req.cookies.accessToken
