@@ -1,12 +1,14 @@
-import dotenv from "dotenv"
-dotenv.config()
 import express from "express"
 import admin from "firebase-admin"
 import cookieParser from "cookie-parser"
 import fetch from "node-fetch"
 import cors from "cors"
+import helmet from "helmet"
 import pino from "pino"
 import Joi from "joi"
+import { rateLimit } from "express-rate-limit"
+import dotenv from "dotenv"
+dotenv.config()
 
 const postSchema = Joi.object({
   title: Joi.string().required().min(1).max(100),
@@ -26,7 +28,7 @@ const categorySchema = Joi.object({
 })
 
 const getClientIp = (req) => {
-  return req.ip ||req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
+  return req.ip || req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
 }
 
 const logger = pino({
@@ -42,28 +44,52 @@ const logger = pino({
 })
 
 const app = express()
+
+const allowedOrigins = [
+  'https://teazy-tech-seven.vercel.app',
+  'http://localhost:3000'
+]
+
 const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'https://teazy-tech-seven.vercel.app',
-       ];
-   if (!origin) return callback(null, true);
+  if (!origin) return callback(null, true)
     
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost')) {
-      callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true)
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'))
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['set-cookie'],
+  maxAge: 86400 
 }
 
+app.use(helmet())
 app.use(cors(corsOptions))
-app.options('*', cors(corsOptions))
-app.use(express.json())
+app.options('/*', cors(corsOptions))
+
+app.use((req, res, next) => {
+  res.header('X-Content-Type-Options', 'nosniff')
+  res.header('X-Frame-Options', 'DENY')
+  res.header('X-XSS-Protection', '1; mode=block')
+  res.header('Referrer-Policy', 'same-origin')
+  next()
+})
+
+app.use("/*", (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin)
+    res.header('Access-Control-Allow-Credentials', 'true')
+    res.status(200).end()
+    return
+  }
+  next()
+})
+
+app.use(express.json({ limit: '10kb' }))
 app.use(cookieParser())
 
 logger.info("Initializing Firebase Admin SDK...")
@@ -98,7 +124,18 @@ const updateUserStats = async (userId, amount) => {
   })
 }
 
-app.post("/api/admin/login", async (req, res) => {
+const rateLimiter = (req, res, next) => {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 100,
+    message: `Too many requests. Please try again`,
+    standardHeaders: true,  
+    legacyHeaders: false   
+  })
+  return limiter(req, res, next)
+}
+
+app.post("/api/admin/login", rateLimiter, async (req, res) => {
   const { email, password } = req.body
   logger.info("Login attempt", { email })
 
@@ -141,14 +178,14 @@ app.post("/api/admin/login", async (req, res) => {
 
     const userData = adminDoc.data()  
     res.cookie("accessToken", data.idToken, {
-    httpOnly: true,
-    secure: true, 
-    maxAge: 3600 * 1000,
-    path: "/",
-    domain: ".vercel.app",
-    sameSite: "none"
-    partitioned: true  
-   })
+      httpOnly: true,
+      secure: true, 
+      maxAge: 3600 * 1000,
+      path: "/",
+      domain: "teazy-tech-seven.vercel.app",
+      sameSite: "none",
+      partitioned: true  
+    })
 
     return res.json({  
       uid: user.uid,  
@@ -196,7 +233,7 @@ app.post("/api/admin/logout", (req, res) => {
   httpOnly: true,
   secure: true,
   path: "/",
-  domain: ".vercel.app",
+  domain: "teazy-tech-seven.vercel.app",
   sameSite: "none"
 })
   return res.json({ message: "Logged out" })
@@ -657,4 +694,13 @@ app.post("/api/posts/:id/view", async (req, res) => {
   }
 })
 
-app.listen(5000, () => logger.info("Server running on port 5000"))
+app.use((err, req, res, next) => {
+  logger.error(err.stack)
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  })
+})
+
+const PORT = process.env.PORT || 5000
+app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
