@@ -182,7 +182,6 @@ app.post("/api/admin/login", rateLimiter, async (req, res) => {
       secure: true, 
       maxAge: 3600 * 1000,
       path: "/",
-      domain: "teazy-tech-seven.vercel.app",
       sameSite: "none",
       partitioned: true  
     })
@@ -233,7 +232,6 @@ app.post("/api/admin/logout", (req, res) => {
   httpOnly: true,
   secure: true,
   path: "/",
-  domain: "teazy-tech-seven.vercel.app",
   sameSite: "none"
 })
   return res.json({ message: "Logged out" })
