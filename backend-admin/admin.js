@@ -42,15 +42,27 @@ const logger = pino({
 })
 
 const app = express()
-app.use(cors({
-  origin: process.env.FRONTEND_DOMAIN,
-  credentials: true,  
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-requested-with"],
-  exposedHeaders: ["set-cookie"]  
-}))
-app.set("trust proxy", 1)  
-app.options('*', cors(corsOptions)) 
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://teazy-tech-seven.vercel.app',
+       ];
+   if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['set-cookie']
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
 
