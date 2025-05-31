@@ -100,7 +100,7 @@ const Blog = () => {
                     <div className="blog-post-content">
                       <div className="blog-post-meta">
                         <span className="blog-post-date">{post.published_date}</span>
-                        <span className="blog-post-author">By Admin</span>
+                        <span className="blog-post-author">By Teazy</span>
                         <span className="blog-post-views">{post.views || 0} views</span>
                       </div>
                       <h2>{post.title}</h2>

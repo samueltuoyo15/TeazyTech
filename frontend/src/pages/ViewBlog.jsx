@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/Blog.css";
+import "../styles/ViewBlog.css";
 
 const ViewBlog = () => {
   const { id } = useParams();
@@ -28,13 +28,8 @@ const ViewBlog = () => {
           }
         );
 
-        if (!response.data) {
-          throw new Error("Post data missing");
-        }
-
-        if (response.data.status !== "published") {
-          throw new Error("Post not published");
-        }
+        if (!response.data) throw new Error("Post data missing");
+        if (response.data.status !== "published") throw new Error("Post not published");
         
         setPost({
           title: response.data.title || "Untitled Post",
@@ -54,136 +49,83 @@ const ViewBlog = () => {
     fetchData();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="blog-page">
-        <section className="blog-hero">
-          <div className="container">
-            <div className="blog-hero-content">
-              <h1>Loading Post...</h1>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="blog-page">
-        <section className="blog-hero">
-          <div className="container">
-            <div className="blog-hero-content">
-              <h1>Error Loading Post</h1>
-              <p>{error}</p>
-              <button 
-                className="btn btn-accent"
-                onClick={() => window.location.reload()}
-              >
-                Try Again
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
-
-  if (!post) {
-    return (
-      <div className="blog-page">
-        <section className="blog-hero">
-          <div className="container">
-            <div className="blog-hero-content">
-              <h1>Post Not Found</h1>
-              <p>The requested blog post could not be found.</p>
-              <a href="/blog" className="btn btn-accent">
-                Back to Blog
-              </a>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
-
-  // Safely parse HTML content
   const createMarkup = (html) => {
     try {
       return { __html: html || "" };
     } catch (e) {
-      console.error("Error parsing HTML content:", e);
       return { __html: "<p>Error displaying content</p>" };
     }
   };
 
+  if (loading) return <div className="loading-spinner"></div>;
+  if (error) return <div className="error-message">{error}</div>;
+  if (!post) return <div className="not-found">Post not found</div>;
+
   return (
-    <div className="blog-page">
-      <section className="blog-hero">
-        <div className="container">
-          <div className="blog-hero-content">
-            <h1>{post.title || "Untitled Post"}</h1>
-            <div className="blog-post-meta">
-              <span className="blog-post-date">
-                {post.published_date ? new Date(post.published_date).toLocaleDateString() : "No date"}
-              </span>
-              <span className="blog-post-category">{post.category || "Uncategorized"}</span>
-              <span className="blog-post-views">{post.views || 0} views</span>
-            </div>
+    <div className="blog-container">
+      {/* Hero Section */}
+      <header className="blog-header">
+        <div className="header-content">
+          <h1 className="blog-title">{post.title}</h1>
+          <div className="blog-meta">
+            <span className="publish-date">
+              {new Date(post.published_date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </span>
+            <span className="category-tag">{post.category}</span>
+            <span className="view-count">{post.views} views</span>
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="section blog-content">
-        <div className="container">
-          <div className="blog-layout">
-            <div className="blog-main">
-              <article className="single-blog-post">
-                {(post.thumbnail || "").trim() && (
-                  <div className="single-post-image">
-                    <img 
-                      src={post.thumbnail} 
-                      alt={post.title || ""}
-                      onError={(e) => {
-                        e.target.src = '/placeholder-image.jpg';
-                        e.target.style.display = 'block';
-                      }}
-                    />
-                    <div className="blog-post-category">{post.category || ""}</div>
-                  </div>
-                )}
-                
-                <div className="single-post-content">
-                  <div dangerouslySetInnerHTML={createMarkup(post.content)} />
-                </div>
-              </article>
-            </div>
-
-            <div className="blog-sidebar">
-              <div className="sidebar-widget categories-widget">
-                <h3>Categories</h3>
-                <ul className="category-list">
-                  <li>
-                    <a href={`/blog?category=${encodeURIComponent(post.category || "")}`}>
-                      {post.category || "Uncategorized"}
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+      {/* Featured Image */}
+      {post.thumbnail && (
+        <div className="featured-image-container">
+          <img
+            src={post.thumbnail}
+            alt={post.title}
+            className="featured-image"
+            onError={(e) => {
+              e.target.src = '/placeholder-image.jpg';
+              e.target.classList.add('error-image');
+            }}
+          />
         </div>
-      </section>
+      )}
 
-      <section className="section blog-cta">
-        <div className="container">
-          <div className="blog-cta-content text-center">
-            <a href="/blog" className="btn btn-accent">
-              Back to Blog
+      {/* Main Content */}
+      <main className="blog-main-content">
+        <article className="blog-article">
+          <div
+            className="article-content"
+            dangerouslySetInnerHTML={createMarkup(post.content)}
+          />
+        </article>
+
+        {/* Sidebar */}
+        <aside className="blog-sidebar">
+          <div className="sidebar-section">
+            <h3>About {post.category}</h3>
+            <p>Explore more {post.category} articles</p>
+            <a
+              href={`/blog?category=${encodeURIComponent(post.category)}`}
+              className="category-link"
+            >
+              View all {post.category} posts →
             </a>
           </div>
-        </div>
-      </section>
+        </aside>
+      </main>
+
+      {/* Footer CTA */}
+      <footer className="blog-footer">
+        <a href="/blog" className="back-to-blog">
+          ← Back to Blog Home
+        </a>
+      </footer>
     </div>
   );
 };
