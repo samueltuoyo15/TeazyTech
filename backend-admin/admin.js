@@ -636,8 +636,10 @@ app.delete("/api/admin/categories/:id", async (req, res) => {
 })
 
 app.post("/api/posts/:id/view", async (req, res) => {
+  logger.info("api view endpoint hit.....")
   try {
     const postId = req.params.id
+    logger.info("postId", postId)
     const clientIp = getClientIp(req)
     
     if (!postId) {
