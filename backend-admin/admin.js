@@ -50,6 +50,7 @@ app.use(cors({
   exposedHeaders: ["set-cookie"]  
 }))
 app.set("trust proxy", 1)  
+app.options('*', cors(corsOptions)) 
 app.use(express.json())
 app.use(cookieParser())
 
