@@ -206,13 +206,15 @@ const formats = [
               <div className={errors.content ? 'border border-red-500 rounded-md' : ''}>
               <ReactQuill
                 theme="snow"
+                value={content}
+                onChange={setContent}
                 modules={modules}
                 formats={formats}
                 style={{ 
-                  fontFamily: "'Noto Serif', serif",
-                  fontSize: "20px"
-                }}
-              />
+               fontFamily: "'Noto Serif', serif",
+               fontSize: "20px"
+           }}
+          />
               </div>
               {errors.content && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
