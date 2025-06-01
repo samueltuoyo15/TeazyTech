@@ -440,41 +440,48 @@ app.put("/api/admin/posts/:postId", async (req, res) => {
 })
 
 app.delete("/api/admin/posts/:postId", async (req, res) => {
-  const token = req.cookies.accessToken
-  const postId = req.params.postId
+  const token = req.cookies.accessToken;
+  const postId = req.params.postId;
 
-  if (!token) return res.status(401).json({ error: "Unauthorized" })
-  if (!postId) return res.status(400).json({ error: "Post ID required" })
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  if (!postId) return res.status(400).json({ error: "Post ID required" });
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token)
-    const user = await admin.auth().getUser(decoded.uid)
-    const isAdmin = user.customClaims?.admin === true
+    const decoded = await admin.auth().verifyIdToken(token);
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
 
-    if (!isAdmin) return res.status(403).json({ error: "Admin access required" })  
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
 
-    const postRef = db.collection("posts").doc(postId)  
-    const postDoc = await postRef.get()  
+    const postRef = db.collection("posts").doc(postId);
+    const postDoc = await postRef.get();
 
-    if (!postDoc.exists) return res.status(404).json({ error: "Post not found" })  
+    if (!postDoc.exists) return res.status(404).json({ error: "Post not found" });
 
-    await postRef.delete()  
-    if (userStats.postCount > 0) {
-     await updateUserStats(user.uid, -1)
-   }
+    // Get the authorId from the post document
+    const postData = postDoc.data();
+    const authorId = postData.author_id
+
+    if (!authorId) {
+      return res.status(400).json({ error: "Post has no authorId" });
+    }
+
+    await postRef.delete();
     
-    return res.json({   
-      message: "Post deleted successfully",  
-      postId: postId  
-    })
+    await updateUserStats(authorId, -1);
+    
+    return res.json({
+      message: "Post deleted successfully",
+      postId: postId
+    });
   } catch (error) {
-    logger.error("Failed to delete post", error)
+    logger.error("Failed to delete post", error);
     return res.status(500).json({
       error: "Failed to delete post",
       message: error.message
-    })
+    });
   }
-})
+});
 
 app.get("/api/admin/posts/category-counts", async (req, res) => {
   const token = req.cookies.accessToken
