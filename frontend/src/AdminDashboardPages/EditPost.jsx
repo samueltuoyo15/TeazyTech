@@ -129,14 +129,23 @@ const EditPost = () => {
   }
 
   const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['link', 'image', 'video'],
-      ['clean']
-    ]
-  }
+  toolbar: [
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['link', 'image', 'video'],
+    ['blockquote', 'code-block'],
+    ['clean']
+  ]
+};
+
+const formats = [
+  'header',
+  'bold', 'italic', 'underline', 'strike',
+  'list', 'bullet',
+  'link', 'image', 'video',
+  'blockquote', 'code-block'
+];
 
   if (loading) {
     return (
@@ -195,14 +204,15 @@ const EditPost = () => {
                 Content <span className="text-red-500">*</span>
               </label>
               <div className={errors.content ? 'border border-red-500 rounded-md' : ''}>
-                <ReactQuill
-                  theme="snow"
-                  value={content}
-                  onChange={setContent}
-                  modules={modules}
-                  placeholder="Write your post content here..."
-                  className="min-h-[200px]"
-                />
+              <ReactQuill
+                theme="snow"
+                modules={modules}
+                formats={formats}
+                style={{ 
+                  fontFamily: "'Noto Serif', serif",
+                  fontSize: "20px"
+                }}
+              />
               </div>
               {errors.content && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">

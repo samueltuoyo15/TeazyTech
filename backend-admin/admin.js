@@ -395,6 +395,7 @@ app.get("/api/admin/posts/:postId", async (req, res) => {
       content: postData.content,
       thumbnail: postData.thumbnail,
       category: postData.category
+      
     });
   } catch (error) {
     logger.error("Failed to fetch post", error);

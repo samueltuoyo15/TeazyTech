@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 /* Blog.css */
 
 /* Base Styles */
@@ -8,6 +10,7 @@
   font-family: 'Georgia', serif;
   line-height: 1.6;
   color: #333;
+  font-family: 'Noto Serif', Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 /* Loading State */
