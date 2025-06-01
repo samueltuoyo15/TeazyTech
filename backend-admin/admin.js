@@ -360,29 +360,45 @@ app.get("/api/admin/posts", async (req, res) => {
 })
 
 app.get("/api/admin/posts/:postId", async (req, res) => {
- const postId = req.params.postId
- if (!postId) return res.status(400).json({ error: "Post ID required" })
+  const postId = req.params.postId;
+  if (!postId) return res.status(400).json({ error: "Post ID required" });
 
   try {
-    const postRef = db.collection("posts").doc(postId)  
-    const postDoc = await postRef.get()  
+    const postRef = db.collection("posts").doc(postId);
+    const postDoc = await postRef.get();
 
-    if (!postDoc.exists) return res.status(404).json({ error: "Post not found" })  
+    if (!postDoc.exists) return res.status(404).json({ error: "Post not found" });
 
-    const postData = postDoc.data()  
-    return res.json({  
-      id: postId,  
+    const postData = postDoc.data();
+    
+    let formattedDate = null;
+    if (postData.updated_at) {
+      try {
+        const publishedDate = postData.updated_at.toDate();
+        formattedDate = new Intl.DateTimeFormat("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }).format(publishedDate);
+      } catch (e) {
+        logger.warn("Failed to format date", e);
+      }
+    }
+
+    return res.json({
+      id: postId,
       views: postData.views || 0,
-      ...postData  
-    })
+      published_date: formattedDate,
+      ...postData
+    });
   } catch (error) {
-    logger.error("Failed to fetch post", error)
+    logger.error("Failed to fetch post", error);
     return res.status(500).json({
       error: "Failed to fetch post",
       message: error.message
-    })
+    });
   }
-})
+});
 
 app.put("/api/admin/posts/:postId", async (req, res) => {
   const token = req.cookies.accessToken
