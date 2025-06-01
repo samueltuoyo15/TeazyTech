@@ -440,41 +440,48 @@ app.put("/api/admin/posts/:postId", async (req, res) => {
 })
 
 app.delete("/api/admin/posts/:postId", async (req, res) => {
-  const token = req.cookies.accessToken
-  const postId = req.params.postId
+  const token = req.cookies.accessToken;
+  const postId = req.params.postId;
 
-  if (!token) return res.status(401).json({ error: "Unauthorized" })
-  if (!postId) return res.status(400).json({ error: "Post ID required" })
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  if (!postId) return res.status(400).json({ error: "Post ID required" });
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token)
-    const user = await admin.auth().getUser(decoded.uid)
-    const isAdmin = user.customClaims?.admin === true
+    const decoded = await admin.auth().verifyIdToken(token);
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
 
-    if (!isAdmin) return res.status(403).json({ error: "Admin access required" })  
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
 
-    const postRef = db.collection("posts").doc(postId)  
-    const postDoc = await postRef.get()  
+    const postRef = db.collection("posts").doc(postId);
+    const postDoc = await postRef.get();
 
-    if (!postDoc.exists) return res.status(404).json({ error: "Post not found" })  
+    if (!postDoc.exists) return res.status(404).json({ error: "Post not found" });
 
-    await postRef.delete()  
-    if (userStats.postCount > 0) {
-     await updateUserStats(user.uid, -1)
-   }
+    // Get the authorId from the post document
+    const postData = postDoc.data();
+    const authorId = postData.author_id
+
+    if (!authorId) {
+      return res.status(400).json({ error: "Post has no authorId" });
+    }
+
+    await postRef.delete();
     
-    return res.json({   
-      message: "Post deleted successfully",  
-      postId: postId  
-    })
+    await updateUserStats(authorId, -1);
+    
+    return res.json({
+      message: "Post deleted successfully",
+      postId: postId
+    });
   } catch (error) {
-    logger.error("Failed to delete post", error)
+    logger.error("Failed to delete post", error);
     return res.status(500).json({
       error: "Failed to delete post",
       message: error.message
-    })
+    });
   }
-})
+});
 
 app.get("/api/admin/posts/category-counts", async (req, res) => {
   const token = req.cookies.accessToken
@@ -640,67 +647,85 @@ app.delete("/api/admin/categories/:id", async (req, res) => {
 })
 
 app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
-  logger.info("api view endpoint hit.....se")
+  console.log('[VIEW TRACKING] Starting request for post:', req.params.id)
+  
   try {
     const postId = req.params.id
-    if(!postId){
+    console.log('[VIEW TRACKING] Extracted post ID:', postId)
+
+    const clientIp = getClientIp(req)
+    console.log('[VIEW TRACKING] Client IP:', clientIp)
+    
+    if (!postId) {
+      console.error('[VIEW TRACKING] Missing post ID')
       return res.status(400).json({ error: 'Post ID is required' })
     }
-    console.log("postId:", postId)
-    const clientIp = getClientIp(req)
-    if (!clientIp) {
-      return res.status(400).json({ error: 'Could not determine client IP' })
-    }
-    console.log("Tracking view for post", { postId, clientIp })
+
     const postRef = db.collection("posts").doc(postId)
+    console.log('[VIEW TRACKING] Post reference created')
     
     await db.runTransaction(async (transaction) => {
+      console.log('[TRANSACTION] Starting transaction')
+      
       const postDoc = await transaction.get(postRef)
+      console.log('[TRANSACTION] Post document fetched')
       
       if (!postDoc.exists) {
+        console.error('[TRANSACTION] Post not found in Firestore')
         throw new Error('Post not found')
       }
       
       const postData = postDoc.data()
-      const viewedIPs = postData.viewedIPs || []
+      console.log('[TRANSACTION] Post data:', { 
+        status: postData.status, 
+        views: postData.views,
+        hasAuthor: !!postData.author_id
+      })
       
-        if (!viewedIPs.includes(clientIp)) {
-        const newViewCount = (postData.views || 0) + 1
+      if (postData.status !== "published") {
+        console.warn('[TRANSACTION] Attempt to view unpublished post')
+        return res.status(403).json({ error: 'Post not published' })
+      }
+
+      const viewedIPs = postData.viewedIPs || []
+      console.log('[TRANSACTION] Existing IPs:', viewedIPs)
+      
+      if (!viewedIPs.includes(clientIp)) {
+        console.log('[TRANSACTION] New view from IP:', clientIp)
         
         transaction.update(postRef, {
-          views: newViewCount,
+          views: (postData.views || 0) + 1,
           viewedIPs: [...viewedIPs, clientIp],
           updated_at: admin.firestore.FieldValue.serverTimestamp()
         })
 
-         const adminId = postData.author_id
-        console.log("Admin ID for post:", adminId)
-        if (!adminId) {
-          throw new Error('Admin ID not found for post')
+        if (postData.author_id) {
+          console.log('[TRANSACTION] Updating author stats for:', postData.author_id)
+          const adminRef = db.collection("user").doc(postData.author_id)
+          transaction.update(adminRef, {
+            total_views: admin.firestore.FieldValue.increment(1),
+            updated_at: admin.firestore.FieldValue.serverTimestamp()
+          })
         }
-        console.log("Tracking view for admin", { adminId })
-        if (adminId) {
-          const adminRef = db.collection("user").doc(adminId)
-          const adminDoc = await transaction.get(adminRef)
-          
-          if (adminDoc.exists) {
-            const currentTotalViews = adminDoc.data().total_views || 0
-            transaction.update(adminRef, {
-              total_views: currentTotalViews + 1,
-              updated_at: admin.firestore.FieldValue.serverTimestamp()
-            })
-          }
-        }
+      } else {
+        console.log('[TRANSACTION] Duplicate view from IP:', clientIp)
       }
     })
     
-    return res.status(200).json({ success: true })
+    console.log('[VIEW TRACKING] Successfully completed')
+    return res.json({ success: true })
     
   } catch (error) {
-    console.error('Error tracking post view:', error, error.message)
+    console.error('[VIEW TRACKING ERROR] Full error:', {
+      message: error.message,
+      stack: error.stack,
+      postId: req.params?.id,
+      timestamp: new Date().toISOString()
+    })
+    
     return res.status(500).json({ 
       error: 'Failed to track view',
-      message: error.message 
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
     })
   }
 })
@@ -712,6 +737,7 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
   })
 })
+
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
