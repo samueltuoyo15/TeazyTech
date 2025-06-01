@@ -393,6 +393,7 @@ app.get("/api/admin/posts/:postId", async (req, res) => {
       published_date: formattedDate, 
       title: postData.title,
       content: postData.content,
+      excerpt: postData.excerpt,
       thumbnail: postData.thumbnail,
       category: postData.category,
       status: postData.status
