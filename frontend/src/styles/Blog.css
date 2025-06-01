@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 /* Blog Hero */
 .blog-hero {
   background-color: var(--secondary-red);
   color: var(--primary-white);
   padding: 8rem 0 4rem;
   text-align: center;
+  font-family: 'Noto Serif', Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 .blog-hero-content h1 {
@@ -22,7 +25,7 @@
 .blog-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 3rem;
+  gap: 3rem; 
 }
 
 /* Blog Main */

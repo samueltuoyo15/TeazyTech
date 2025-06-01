@@ -1,4 +1,8 @@
-/* Blog.css */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+body {
+    font-family: 'Noto Serif', Georgia, Cambria, "Times New Roman", Times, serif;
+}
 
 /* Base Styles */
 .blog-container {
@@ -8,6 +12,7 @@
   font-family: 'Georgia', serif;
   line-height: 1.6;
   color: #333;
+  font-family: 'Noto Serif', Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 /* Loading State */
@@ -56,6 +61,7 @@
 }
 
 .blog-title {
+  margin-top: 20px;
   font-size: 42px;
   font-weight: 700;
   margin-bottom: 20px;
@@ -113,6 +119,7 @@
   flex-direction: column;
   gap: 40px;
   max-width: 900px;
+  font-family: 'Noto Serif', Georgia, Cambria, "Times New Roman", Times, serif;
   margin: 0 auto;
 }
 

@@ -35,7 +35,7 @@ const ViewBlog = () => {
           title: response.data.title || "Untitled Post",
           content: response.data.content || "<p>Content not available</p>",
           thumbnail: response.data.thumbnail || "",
-          published_date: response.data.published_date || new Date().toISOString(),
+          published_date: response.data.published_date || "date not available",
           category: response.data.category || "Uncategorized",
           views: response.data.views || 0
         });
@@ -69,7 +69,7 @@ const ViewBlog = () => {
           <h1 className="blog-title">{post.title}</h1>
           <div className="blog-meta">
             <span className="publish-date">
-             {post?.published_date || Date.now()}
+             {post?.published_date || "Date not available"}
             </span>
             <span className="category-tag">{post.category}</span>
             <span className="view-count">{post.views} views</span>

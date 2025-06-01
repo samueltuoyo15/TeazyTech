@@ -371,10 +371,12 @@ app.get("/api/admin/posts/:postId", async (req, res) => {
 
     const postData = postDoc.data();
     
-    let formattedDate = null;
-    if (postData.updated_at) {
+  const dateToFormat = postData.updated_at || postData.created_at;
+    let formattedDate = "Date not available"
+    
+   if (dateToFormat) {
       try {
-        const publishedDate = postData.updated_at.toDate();
+        const publishedDate = dateToFormat.toDate();
         formattedDate = new Intl.DateTimeFormat("en-GB", {
           day: "numeric",
           month: "long",
@@ -388,8 +390,13 @@ app.get("/api/admin/posts/:postId", async (req, res) => {
     return res.json({
       id: postId,
       views: postData.views || 0,
-      published_date: formattedDate,
-      ...postData
+      published_date: formattedDate, 
+      title: postData.title,
+      content: postData.content,
+      excerpt: postData.excerpt,
+      thumbnail: postData.thumbnail,
+      category: postData.category,
+      status: postData.status
     });
   } catch (error) {
     logger.error("Failed to fetch post", error);
