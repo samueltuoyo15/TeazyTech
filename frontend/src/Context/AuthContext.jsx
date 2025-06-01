@@ -15,8 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [shouldCheckAuth, setShouldCheckAuth] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); 
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
@@ -28,14 +27,13 @@ export const AuthProvider = ({ children }) => {
     
     const getAuthAdmin = async () => {
       try {
-        setIsLoading(true);
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/me`, { 
           withCredentials: true,
           signal: controller.signal
         });
         if (isMounted) {
           setUser(response.data);
-          setIsAuthenticated(true);
+          setIsAuthenticated(true); 
           setError(null);
         }
       } catch(error) {
@@ -51,21 +49,12 @@ export const AuthProvider = ({ children }) => {
       }
     };
     
-    if (shouldCheckAuth) {
-      getAuthAdmin();
-    } else {
-      setIsLoading(false);
-    }
-    
+    getAuthAdmin();
     return () => {
       isMounted = false;
       controller.abort();
     };
-  }, [shouldCheckAuth]);
-
-  const enableAuthCheck = () => {
-    setShouldCheckAuth(true);
-  };
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -75,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         { withCredentials: true }
       );
       setUser(response.data);
-      setIsAuthenticated(true);
+      setIsAuthenticated(true); 
       setError(null);
       return true;
     } catch(error) {
@@ -108,12 +97,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated,
+        isAuthenticated, 
         isLoading,
         error,
         login,
         logout,
-        enableAuthCheck,
       }}
     >
       {children}
