@@ -69,7 +69,7 @@ const ViewBlog = () => {
           <h1 className="blog-title">{post.title}</h1>
           <div className="blog-meta">
             <span className="publish-date">
-             {post.published_date}
+             {post?.published_date || Date.now()}
             </span>
             <span className="category-tag">{post.category}</span>
             <span className="view-count">{post.views} views</span>
