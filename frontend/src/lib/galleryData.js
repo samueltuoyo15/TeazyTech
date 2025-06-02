@@ -15,7 +15,8 @@ const galleryData = [
             "/images/Gallery Ibadan Training/IMG_7753.jpg",
             "/images/Gallery Ibadan Training/IMG_7759.jpg",
         ],
-        description: "Our event at Ibadan.",
+        description:
+            "Private EdTech integration training session for teachers from Golden Beryl International School Ibadan.",
         category: "events",
     },
     {
@@ -34,7 +35,8 @@ const galleryData = [
             "/images/Gallery Kaduna Training/IMG_6094.jpg",
             "/images/Gallery Kaduna Training/IMG_6147.jpg",
         ],
-        description: "Our event at Kaduna.",
+        description:
+            "General EdTech integration training session for teachers from a group of 5 schools in Kaduna.",
         category: "events",
     },
     {

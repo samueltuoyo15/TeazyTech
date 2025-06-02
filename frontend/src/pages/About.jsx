@@ -63,32 +63,15 @@ const About = () => {
                         <div className="our-story-text">
                             <h2>Our Story</h2>
                             <p>
-                                Princess Natasha Balogun Momoh has always been
-                                deeply passionate about education. But her heart
-                                broke when she saw how far behind many schools
-                                were in using technology, especially in Africa.
+                                Princess Natasha has always been passionate about education and its advancement. In 2022, she carried out a research to analyze the concerns of Nigerian teachers to integrate technology into their teaching and learning process. The results from this study birthed Teazy Tech and changed the way she empatized with teachers. She noticed a gap in the system- teachers were under trained, misinformed, and wrongfully scared of technology integration because of perceived difficulty, but with Teazy Tech she and the solid Teazy Tech team have been able to bridge that gap. 
+
                             </p>
                             <p>
-                                In 2022, she led a research project to truly
-                                listen to teachers&apos; thoughts on technology.
-                                The results were eye-opening. Many teachers
-                                described tech as confusing, time-consuming and
-                                even threatening: “It&apos;s too hard to use,”
-                                “It&apos;s replacing us,” “How does this help my
-                                students?” These weren&apos;t just passing
-                                comments, they were honest concerns shared by
-                                over 70% of K–12 teachers in Nigeria.That&apos;s
-                                when Teazy Tech was born.
+                                Teazy Tech is an acronym for Teach Easy Technology, we are an EdTech company dedicated to helping teachers transition from the traditional ways of teaching (teacher centered, chalk and black board, etc) to the use of more digital pedagogies. Since our inception, we have prioritzed the growth of educators through the development of customized resources, courses, and comprehensive training programs. We were born out a necessity not a want because we believe that teachers play an indispensable role in education, so we must demystify educational technology. 
+
                             </p>
                             <p>
-                                What started as a few online post grew into
-                                hands-on workshops, personal support, and a
-                                growing community for Educators. Today, Teazy
-                                Tech is training over 200 teachers for free,
-                                giving them the tools and confidence to bring
-                                Edtech into their classrooms.We&apos;re just
-                                getting started and we&apos;d love for you to
-                                join us on this journey.
+                                Today, we are building a community of teachers that want to make a difference in their classrooms and change the education space with EdTech. We partner with private institutions, individual teachers, and government institutions in a bid to reach more teachers one training and resource at a time. We are primarily impact driven. 
                             </p>
                         </div>
                     </div>
@@ -370,7 +353,7 @@ const About = () => {
                     </div>
                     <div className="impact-stats">
                         <div className="impact-stat">
-                            <div className="impact-number">500+</div>
+                            <div className="impact-number">1000+</div>
                             <p>Teachers Trained</p>
                         </div>
                         <div className="impact-stat">

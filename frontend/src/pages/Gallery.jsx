@@ -37,9 +37,13 @@ const Gallery = () => {
 
     const navigateLightbox = (direction) => {
         if (direction === "next") {
-            setIndex((index + 1) % selectedItem.images.length);
+            setIndex(
+                (prevIndex) => (prevIndex + 1) % selectedItem.images.length
+            );
         } else {
-            setIndex((index - 1) % selectedItem.images.length);
+            setIndex(
+                (prevIndex) => (prevIndex - 1) % selectedItem.images.length
+            );
         }
     };
 

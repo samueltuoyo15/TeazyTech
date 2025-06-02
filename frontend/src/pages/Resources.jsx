@@ -16,89 +16,6 @@ const Resources = () => {
         { id: "research", name: "Research & Case Studies" },
     ];
 
-    const resources = [
-        {
-            id: 1,
-            title: "Getting Started with Educational Technology",
-            category: "guides",
-            image: "/images/resource1.png",
-            description:
-                "A comprehensive guide for teachers new to educational technology.",
-            type: "PDF Guide",
-            date: "June 15, 2023",
-        },
-        {
-            id: 2,
-            title: "Creating Engaging Virtual Lessons",
-            category: "webinars",
-            image: "/images/resource2.png",
-            description:
-                "Learn strategies for designing online lessons that keep students motivated.",
-            type: "Recorded Webinar",
-            date: "May 28, 2023",
-        },
-        {
-            id: 3,
-            title: "Digital Assessment Tools",
-            category: "tools",
-            image: "/images/resource3.png",
-            description:
-                "Templates and tools for creating effective digital assessments.",
-            type: "Template Pack",
-            date: "May 10, 2023",
-        },
-        {
-            id: 4,
-            title: "Technology Integration in STEM Subjects",
-            category: "research",
-            image: "/images/resource4.png",
-            description:
-                "Case studies on successful technology integration in science and math classrooms.",
-            type: "Research Report",
-            date: "April 22, 2023",
-        },
-        {
-            id: 5,
-            title: "Interactive Whiteboard Basics",
-            category: "guides",
-            image: "/images/resource5.png",
-            description:
-                "Step-by-step tutorial on maximizing your interactive whiteboard.",
-            type: "Video Tutorial",
-            date: "April 5, 2023",
-        },
-        {
-            id: 6,
-            title: "Accessibility in Digital Learning",
-            category: "webinars",
-            image: "/images/resource6.png",
-            description:
-                "Ensuring your digital materials are accessible to all students.",
-            type: "Recorded Webinar",
-            date: "March 18, 2023",
-        },
-        {
-            id: 7,
-            title: "Classroom Management Apps",
-            category: "tools",
-            image: "/images/resource7.png",
-            description:
-                "A comparison of popular classroom management applications.",
-            type: "Comparison Guide",
-            date: "March 3, 2023",
-        },
-        {
-            id: 8,
-            title: "Impact of 1:1 Device Programs",
-            category: "research",
-            image: "/images/resource8.png",
-            description:
-                "Research on the effectiveness of one-to-one device programs in schools.",
-            type: "Research Report",
-            date: "February 15, 2023",
-        },
-    ];
-
     const filteredResources =
         activeCategory === "all"
             ? resourceData
@@ -141,6 +58,27 @@ const Resources = () => {
                     </div>
                 </div>
             </section>
+
+            <div className="group flex items-center w-4/5 mx-auto gap-3">
+                <a
+                    className="text-lg text-indigo-500 lg:text-2xl hover:decoration-red-300 hover:text-red-400 underline underline-offset-2"
+                    href="https://selar.com/m/teazy-tech1?category=all"
+                    target="_blank"
+                >
+                    Explore our Online Courses on Selar
+                </a>
+                <a
+                    href="https://selar.com/m/teazy-tech1?category=all"
+                    target="_blank"
+                >
+                    <svg
+                        className="w-6 fill-indigo-500 group-hover:translate-x-3 transform-transition duration-300 group-hover:fill-red-500"
+                        viewBox="0 0 32 32"
+                    >
+                        <path d="M19.414 27.414l10-10c0.781-0.781 0.781-2.047 0-2.828l-10-10c-0.781-0.781-2.047-0.781-2.828 0s-0.781 2.047 0 2.828l6.586 6.586h-19.172c-1.105 0-2 0.895-2 2s0.895 2 2 2h19.172l-6.586 6.586c-0.39 0.39-0.586 0.902-0.586 1.414s0.195 1.024 0.586 1.414c0.781 0.781 2.047 0.781 2.828 0z"></path>
+                    </svg>
+                </a>
+            </div>
 
             {/* Resources Grid */}
             <section className="section resources-grid-section">
@@ -219,7 +157,7 @@ const Resources = () => {
                                 </li>
                             </ul>
                             <a
-                                href="https://drive.google.com/file/d/1GAFr_OOxWv4s5vI0TrZmhqW9QPph0ZQ1/view?usp=drivesdk"
+                                href=" https://selar.com/24ua7n "
                                 target="_blank"
                                 className="btn btn-primary"
                             >

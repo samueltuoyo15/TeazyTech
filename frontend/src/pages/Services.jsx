@@ -193,7 +193,7 @@ const Services = () => {
                                         }}
                                     ></i>
                                 </div>
-                                <h3>Digital Content Creation</h3>
+                                <h3>Instructional Content Design</h3>
                                 <p>
                                     Create engaging, interactive digital
                                     learning materials that captivate students
@@ -481,10 +481,9 @@ const Services = () => {
                         <div className="faq-item">
                             <h3>Am I paying for the resources or guide?</h3>
                             <p>
-                                No, all our resources and guides are completely
-                                free because we believe every educator deserves
-                                access to helpful tools without worrying about
-                                any cost.
+                                No, majority of our resources and guides are
+                                free for teachers and if they are paid, we
+                                always make sure educators can afford it.
                             </p>
                         </div>
 
@@ -511,6 +510,16 @@ const Services = () => {
                                 school&apos;s name and location, and we&apos;ll
                                 plan a tailored physical training session that
                                 fits your school&apos;s specific needs.
+                            </p>
+                        </div>
+
+                        <div className="faq-item">
+                            <h3>Can you train my school privately?</h3>
+                            <p>
+                                Yes, we offer private training sessions for
+                                schools that want to develop the educational
+                                technology integration skills of their staff.
+                                Send us an email for more information.
                             </p>
                         </div>
 
