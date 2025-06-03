@@ -65,9 +65,9 @@ const Resources = () => {
 
             {/* Resources Grid */}
             <section className="section resources-grid-section">
-                <div className="group p-3 rounded-2xl bg-indigo-500 flex items-center gap-3">
+                <div className="group bg-indigo-500 flex items-center w-4/5 mx-auto gap-3">
                 <a
-                    className="text-lg text-white lg:text-2xl hover:decoration-red-300 hover:text-red-400 underline underline-offset-2"
+                    className="text-lg text-indigo-500 lg:text-2xl hover:decoration-red-300 hover:text-red-400 underline underline-offset-2"
                     href="https://selar.com/m/teazy-tech1?category=all"
                     target="_blank"
                 >
