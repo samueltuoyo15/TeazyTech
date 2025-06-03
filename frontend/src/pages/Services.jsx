@@ -102,7 +102,7 @@ const Services = () => {
                                     </li>
                                 </ul>
                                 <Link
-                                    to="/services/professional-development"
+                                    to="/contact"
                                     className="btn btn-primary"
                                 >
                                     Learn More
@@ -162,7 +162,7 @@ const Services = () => {
                                     </li>
                                 </ul>
                                 <Link
-                                    to="/services/technology-integration"
+                                    to="/contact"
                                     className="btn btn-secondary"
                                 >
                                     Learn More
@@ -222,7 +222,7 @@ const Services = () => {
                                     </li>
                                 </ul>
                                 <Link
-                                    to="/services/content-creation"
+                                    to="/contact"
                                     className="btn btn-accent"
                                 >
                                     Learn More
@@ -283,7 +283,7 @@ const Services = () => {
                                     </li>
                                 </ul>
                                 <Link
-                                    to="/services/strategic-planning"
+                                    to="/contact"
                                     className="btn btn-primary"
                                 >
                                     Learn More

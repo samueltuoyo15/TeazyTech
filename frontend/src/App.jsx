@@ -9,6 +9,7 @@ import Services from "./pages/Services.jsx";
 import Gallery from "./pages/Gallery.jsx";
 import Blog from "./pages/Blog.jsx";
 import ViewBlog from './pages/ViewBlog.jsx';
+import Contact from './pages/Contact.jsx';
 import "./App.css";
 
 // Admin imports
@@ -78,6 +79,14 @@ const App = () => {
                                 <Routes>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/about" element={<About />} />
+                                    <Route
+                                        path="/resources"
+                                        element={<Resources />}
+                                    />
+                                    <Route
+                                        path="/contact"
+                                        element={<Contact />}
+                                    />
                                     <Route
                                         path="/resources"
                                         element={<Resources />}
