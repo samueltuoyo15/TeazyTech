@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import "../styles/Services.css";
 
 const Services = () => {
+       useEffect(() => {
+            window.scroll({ top: 0,left: 0, behaviour: "smooth" })
+        }, [])
     return (
         <div className="services-page">
             {/* Hero Section */}

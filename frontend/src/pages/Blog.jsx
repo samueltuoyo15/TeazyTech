@@ -51,7 +51,9 @@ const Blog = () => {
     e.preventDefault()
    console.log("Searching for:", searchQuery)
   }
-
+     useEffect(() => {
+        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
+    }, [])
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = selectedCategory === "All Categories" || post.category === selectedCategory
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 

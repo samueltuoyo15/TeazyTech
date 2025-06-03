@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/Gallery.css";
 import galleryData from "../lib/galleryData";
 
@@ -15,7 +15,9 @@ const Gallery = () => {
         category: "",
     });
     const [index, setIndex] = useState(0);
-
+   useEffect(() => {
+        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
+    }, [])
     const filters = [
         { id: "all", name: "All" },
         { id: "events", name: "Events" },

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Importing section components
 import HeroSection from "../components/home/HeroSection";
@@ -18,6 +18,9 @@ import FormSection from "../components/home/formSection";
 const Home = () => {
     const [showSuccess, setShowSuccess] = useState(false);
     const [showFailure, setShowFailure] = useState(false);
+       useEffect(() => {
+        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
+    }, [])
     return (
         <div className="home-page">
             {/* Hero with subtle fade-up animation */}

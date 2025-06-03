@@ -8,7 +8,9 @@ const ViewBlog = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+   useEffect(() => {
+        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
+    }, [])
   useEffect(() => {
     const fetchData = async () => {
       try {
