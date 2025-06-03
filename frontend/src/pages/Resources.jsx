@@ -65,7 +65,9 @@ const Resources = () => {
 
             {/* Resources Grid */}
             <section className="section resources-grid-section">
-                <div className="group bg-indigo-500 flex items-center w-4/5 mx-auto gap-3">
+               
+                <div className="container">
+                     <div className="group flex items-center w-4/5 mx-auto gap-3">
                 <a
                     className="text-lg text-indigo-500 lg:text-2xl hover:decoration-red-300 hover:text-red-400 underline underline-offset-2"
                     href="https://selar.com/m/teazy-tech1?category=all"
@@ -85,7 +87,6 @@ const Resources = () => {
                     </svg>
                 </a>
             </div>
-                <div className="container">
                     <div className="resources-grid">
                         {filteredResources.map((resource) => (
                             <a
