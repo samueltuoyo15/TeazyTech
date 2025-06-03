@@ -28,10 +28,7 @@ const Services = () => {
                                 matter where you are on your journey to
                                 educational technology integration. Beyond
                                 providing personal workshops and training
-                                sessions for teachers.
-                            </p>
-                            <p>
-                                we also partner with private, public and
+                                sessions for teachers, we also partner with private, public and
                                 governmental institutions to improve technology
                                 integration and position you for success on a
                                 global scale.

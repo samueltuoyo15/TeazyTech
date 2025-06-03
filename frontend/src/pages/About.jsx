@@ -206,9 +206,7 @@ const About = () => {
                                 <a href="#" aria-label="LinkedIn">
                                     <i className="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
+                              
                             </div>
                         </div>
 
@@ -232,9 +230,7 @@ const About = () => {
                                 <a href="#" aria-label="LinkedIn">
                                     <i className="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
+                              
                             </div>
                         </div>
 
@@ -257,9 +253,7 @@ const About = () => {
                                 <a href="#" aria-label="LinkedIn">
                                     <i className="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
+                              
                             </div>
                         </div>
                         <div className="team-member">
@@ -281,9 +275,7 @@ const About = () => {
                                 <a href="#" aria-label="LinkedIn">
                                     <i className="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
+                              
                             </div>
                         </div>
                         <div className="team-member">
@@ -306,9 +298,7 @@ const About = () => {
                                 <a href="#" aria-label="LinkedIn">
                                     <i className="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
+                              
                             </div>
                         </div>
 
@@ -332,9 +322,7 @@ const About = () => {
                                 <a href="#" aria-label="LinkedIn">
                                     <i className="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="#" aria-label="Twitter">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
+                              
                             </div>
                         </div>
                     </div>
