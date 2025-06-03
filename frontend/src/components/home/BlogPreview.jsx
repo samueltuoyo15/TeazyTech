@@ -1,6 +1,68 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import axios from "axios"
 
 const BlogPreview = () => {
+   const [blogPosts, setBlogPosts] = useState([])
+   const [loading, setLoading] = useState(true)
+
+   const navigate = useNavigate()
+
+    useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const postsResponse = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`)
+        const publishedPosts = postsResponse.data.filter(post => post.status === "published")
+        setBlogPosts(publishedPosts)
+      } catch (err) {
+        console.error("Error fetching data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPosts()
+  }, [])
+
+    const trackPostView = async (postId, e) => {
+      e.preventDefault()
+      
+      try {
+        await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${postId}/view`)
+        navigate(`/blog/${postId}`)
+      } catch (error) {
+        console.error("Error tracking view:", error)
+        navigate(`/blog/${postId}`)
+      }
+    }
+   const recentPosts = blogPosts.slice(0, 3)
+
+   if (loading) {
+    return (
+      <div className="blog-page">
+        <section className="blog-hero">
+          <div className="container">
+            <div className="blog-hero-content">
+              <h1>Loading Blog...</h1>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+  if (recentPosts.length === 0) {
+    return (
+      <div className="blog-page">
+        <section className="blog-hero">
+          <div className="container">
+            <div className="blog-hero-content">
+              <h1>No Recent Posts Available</h1>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
   return (
     <section className="section blog-preview">
       <div className="container">
@@ -9,22 +71,24 @@ const BlogPreview = () => {
           <p>Insights and tips for educational technology</p>
         </div>
         <div className="blog-preview-grid">
-          <div className="blog-card">
+          {recentPosts.map((post) => (
+          <div key={post.id} className="blog-card">
             <div className="blog-card-image">
               <img 
-                src="https://images.unsplash.com/photo-1593642532973-d31b6557fa68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80" 
-                alt="Blog post" 
+                src={post.thumbnail}
+                alt={post.title} 
               />
             </div>
             <div className="blog-card-content">
-              <div className="blog-card-date">June 15, 2023</div>
-              <h3>10 Essential EdTech Tools Every Teacher Should Know</h3>
-              <p>Discover the must-have technology tools that can transform your classroom experience...</p>
-              <Link to="/blog" className="blog-card-link">
-                Read More <i className="fas fa-arrow-right"></i>
-              </Link>
+              <div className="blog-card-date">{post.published_date}</div>
+              <h3>{post.title}</h3>
+              <p>{post.excerpt}</p>
+                <Link to={`/blog/${post.id}`} onClick={(e) => trackPostView(post.id, e)}>
+                   Read More
+               </Link>
             </div>
           </div>
+            ))}
         </div>
         <div className="blog-preview-cta text-center">
           <Link to="/blog" className="btn btn-primary">
