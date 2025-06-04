@@ -9,6 +9,14 @@
   --transition-speed: 0.3s;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .navbar {
   position: fixed;
   top: 0;
@@ -185,7 +193,7 @@
     color: #333;
     display: flex;
     flex-direction: column;
-    transform: translateX(100%);
+    transform: translateX(100vw);
     transition: transform 0.3s ease-in-out;
     z-index: 1001;
     padding: 1.5rem;
