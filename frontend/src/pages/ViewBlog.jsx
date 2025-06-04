@@ -66,7 +66,7 @@ const ViewBlog = () => {
   return (
     <div className="blog-container">
       {/* Hero Section */}
-      <header className="blog-header">
+      <header className="blog-header mt-10">
         <div className="header-content">
           <h1 className="blog-title">{post.title}</h1>
           <div className="blog-meta">
