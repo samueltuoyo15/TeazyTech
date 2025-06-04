@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useForm, ValidationError } from '@formspree/react';
 
 export default function FormSection({ setShowSuccess, setShowFailure }) {
+    const [state, handleFormspreeSubmit] = useForm("xanjnnwz"); 
     const [fields, setFields] = useState({
         name: "",
         email: "",
@@ -16,34 +18,47 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (fields.name && fields.email && fields.phone && fields.message) {
-            if (
-                showError.name === false &&
-                showError.email === false &&
-                showError.phone === false &&
-                showError.message === false
-            ) {
-                //emailjs.init("TPxhQrfopzurp7Isq");
+        
+        // Validate all fields
+        if (!fields.name || !fields.email || !fields.phone || !fields.message) {
+            setShowError({
+                name: !fields.name,
+                email: !fields.email,
+                phone: !fields.phone,
+                message: !fields.message,
+            });
+            return;
+        }
 
-                //sending four parameters namely: service Id from emailjs, template Id from emailjs,
-                //formdata and emailjs public key/API key
-                try {
-                    /*const response = await emailjs.send(
-                        "service_it769k8",
-                        "template_h0wx2fl",
-                        fields,
-                        "TPxhQrfopzurp7Isq"
-                    );*/
+        // Validate email format
+        if (!fields.email.includes("@") || !fields.email.includes(".")) {
+            setShowError(prev => ({...prev, email: true}));
+            return;
+        }
 
-                    console.log("email sent succesfully", response);
-                    setShowSuccess(true);
-                    setTimeout(() => setShowSuccess(false), 4000);
-                } catch (error) {
-                    setShowFailure(true);
-                    setTimeout(() => setShowFailure(false), 4000);
-                    console.log("failed to submit");
-                }
-            }
+        // Validate phone is numeric
+        if (isNaN(fields.phone)) {
+            setShowError(prev => ({...prev, phone: true}));
+            return;
+        }
+
+        // Submit to Formspree
+        await handleFormspreeSubmit(e);
+
+        // Handle Formspree response
+        if (state.succeeded) {
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 4000);
+            // Reset form
+            setFields({
+                name: "",
+                email: "",
+                phone: "",
+                message: "",
+            });
+        } else if (state.errors) {
+            setShowFailure(true);
+            setTimeout(() => setShowFailure(false), 4000);
         }
     };
 
@@ -52,71 +67,43 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
             ...prev,
             name: e.target.value,
         }));
-        if (e.target.value === "")
-            setShowError({
-                ...showError,
-                name: true,
-            });
-        else
-            setShowError({
-                ...showError,
-                name: false,
-            });
+        setShowError(prev => ({
+            ...prev,
+            name: e.target.value === ""
+        }));
     };
 
     const handleFormChange2 = (e) => {
-        setFields({
-            ...fields,
+        setFields(prev => ({
+            ...prev,
             email: e.target.value,
-        });
-        if (
-            e.target.value === "" ||
-            !e.target.value.includes("@") ||
-            !e.target.value.includes(".")
-        )
-            setShowError({
-                ...showError,
-                email: true,
-            });
-        else
-            setShowError({
-                ...showError,
-                email: false,
-            });
+        }));
+        setShowError(prev => ({
+            ...prev,
+            email: e.target.value === "" || !e.target.value.includes("@") || !e.target.value.includes(".")
+        }));
     };
 
     const handleFormChange3 = (e) => {
-        setFields({
-            ...fields,
+        setFields(prev => ({
+            ...prev,
             phone: e.target.value,
-        });
-        if (e.target.value === "" || isNaN(e.target.value))
-            setShowError({
-                ...showError,
-                phone: true,
-            });
-        else
-            setShowError({
-                ...showError,
-                phone: false,
-            });
+        }));
+        setShowError(prev => ({
+            ...prev,
+            phone: e.target.value === "" || isNaN(e.target.value)
+        }));
     };
 
     const handleFormChange4 = (e) => {
-        setFields({
-            ...fields,
+        setFields(prev => ({
+            ...prev,
             message: e.target.value,
-        });
-        if (e.target.value === "")
-            setShowError({
-                ...showError,
-                message: true,
-            });
-        else
-            setShowError({
-                ...showError,
-                message: false,
-            });
+        }));
+        setShowError(prev => ({
+            ...prev,
+            message: e.target.value === ""
+        }));
     };
 
     return (
@@ -134,7 +121,7 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 -960 960 960"
                             >
-                                <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" />
+                                <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33 23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" />
                             </svg>
                             Teazytech1@gmail.com
                         </li>
@@ -167,12 +154,13 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                             <label id="name" className="flex flex-col">
                                 <span className="">Name</span>
                                 <input
+                                    name="name"
                                     value={fields.name}
                                     onChange={(e) => handleFormChange1(e)}
                                     aria-labelledby="name"
                                     type="text"
                                     className="border border-t-[3px] border-t-slate-300 rounded-md p-1.5 focus:outline-indigo-500"
-                                ></input>
+                                />
                             </label>
                             {showError.name && (
                                 <span className="text-red-500 text-sm">
@@ -185,12 +173,18 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                             <label id="email" className="flex flex-col">
                                 <span className="">Email</span>
                                 <input
+                                    name="email"
                                     value={fields.email}
                                     onChange={(e) => handleFormChange2(e)}
                                     aria-labelledby="email"
                                     type="email"
                                     className="border border-t-[3px] border-t-slate-300 rounded-md p-1.5 focus:outline-indigo-500"
-                                ></input>
+                                />
+                                <ValidationError 
+                                    prefix="Email" 
+                                    field="email"
+                                    errors={state.errors}
+                                />
                             </label>
                             {showError.email && (
                                 <span className="text-red-500 text-sm">
@@ -203,12 +197,13 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                             <label id="phone" className="flex flex-col">
                                 <span className="">Phone Number</span>
                                 <input
+                                    name="phone"
                                     value={fields.phone}
                                     onChange={(e) => handleFormChange3(e)}
                                     aria-labelledby="phone"
-                                    type="number"
+                                    type="tel"
                                     className="border border-t-[3px] border-t-slate-300 rounded-md p-1.5 focus:outline-indigo-500"
-                                ></input>
+                                />
                             </label>
                             {showError.phone && (
                                 <span className="text-red-500 text-sm">
@@ -221,12 +216,17 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                             <label id="message" className="flex flex-col">
                                 <span className="">Message</span>
                                 <textarea
+                                    name="message"
                                     value={fields.message}
                                     onChange={(e) => handleFormChange4(e)}
                                     aria-labelledby="message"
-                                    type="text"
                                     className="h-28 border border-t-[3px] border-t-slate-300 rounded-md p-1.5 focus:outline-indigo-500"
-                                ></textarea>
+                                />
+                                <ValidationError 
+                                    prefix="Message" 
+                                    field="message"
+                                    errors={state.errors}
+                                />
                             </label>
                             {showError.message && (
                                 <span className="text-red-500 text-sm">
@@ -236,10 +236,12 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                         </div>
 
                         <button
+                            type="submit"
                             className="border w-full my-4 bg-indigo-500 hover:bg-indigo-600
                          active:bg-indigo-800 text-white py-1 disabled:bg-indigo-300 cursor-pointer
                          disabled:cursor-default"
                             disabled={
+                                state.submitting ||
                                 fields.name === "" ||
                                 fields.email === "" ||
                                 fields.phone === "" ||
@@ -250,8 +252,9 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                                 showError.message === true
                             }
                         >
-                            Send
+                            {state.submitting ? 'Sending...' : 'Send'}
                         </button>
+                        <ValidationError errors={state.errors} />
                     </form>
                 </div>
             </section>

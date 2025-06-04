@@ -1,13 +1,15 @@
 import FormSection from "../components/home/formSection";
 import AnimatedSection from "../components/home/AnimatedSection";
 import { useState, useEffect } from "react";
+
 const Contact = () => {
      const [showSuccess, setShowSuccess] = useState(false);
      const [showFailure, setShowFailure] = useState(false);
-     
+       
     useEffect(() => {
             window.scroll({ top: 0,left: 0, behaviour: "smooth" })
         }, [])
+
   return (
     <>
         <div className="mt-10">
