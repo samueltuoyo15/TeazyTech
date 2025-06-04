@@ -7,7 +7,7 @@ body {
 /* Base Styles */
 .blog-container {
   max-width: 1200px;
-  margin: 20px auto;
+  margin: 50px auto;
   padding: 0 20px;
   font-family: 'Georgia', serif;
   line-height: 1.6;
@@ -61,7 +61,7 @@ body {
 }
 
 .blog-title {
-  margin-top: 20px;
+  margin-top: 40px;
   font-size: 42px;
   font-weight: 700;
   margin-bottom: 20px;
