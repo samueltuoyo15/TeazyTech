@@ -314,7 +314,7 @@ const About = () => {
                                     alt="Team member"
                                 />
                             </div>
-                            <h3>Adetola</h3>
+                            <h3>Adetola Oriade</h3>
                             <p className="team-member-role">
                                 Social Media Manager
                             </p>
