@@ -61,6 +61,7 @@ const endpointLimiter = rateLimit({
 })
 
 const allowedOrigins = [
+  'https://teazytech.org",
   'https://teazy-tech-seven.vercel.app',
   'http://localhost:3000'
 ]
