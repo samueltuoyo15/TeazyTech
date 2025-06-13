@@ -60,11 +60,7 @@ const endpointLimiter = rateLimit({
   message: 'Too many view requests'
 })
 
-const allowedOrigins = [
-  'https://teazytech.org',
-  'https://teazy-tech-seven.vercel.app',
-  'http://localhost:3000'
-]
+const allowedOrigins = process.env.FRONTEND_DOMAINS?.split(",") || []
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -186,7 +182,7 @@ app.post("/api/admin/login", endpointLimiter, async (req, res) => {
     const userData = adminDoc.data()  
     res.cookie("accessToken", data.idToken, {
       httpOnly: true,
-      secure: true, 
+      secure: process.NODE_ENV === "production", 
       maxAge: 3600 * 1000,
       path: "/",
       sameSite: "none",
@@ -236,7 +232,7 @@ app.get("/api/admin/me", async (req, res) => {
 app.post("/api/admin/logout", (req, res) => {
   res.clearCookie("accessToken", {
   httpOnly: true,
-  secure: true,
+  secure: process.NODE_ENV === "production",
   path: "/",
   sameSite: "none"
 })
