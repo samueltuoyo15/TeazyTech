@@ -39,7 +39,7 @@ const Contact = () => {
                     className="fixed top-[80%] left-[10%] md:left-[40%] bg-white text-red-400 border-[3px] border-red-500
                  rounded-md py-4 px-4 w-[80%] md:w-[20%]"
                 >
-                    Message not sent! Please try again later.
+                    Message not sent! Please try again later
                 </div>
             )}
         </div>
