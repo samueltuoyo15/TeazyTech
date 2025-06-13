@@ -60,7 +60,11 @@ const endpointLimiter = rateLimit({
   message: 'Too many view requests'
 })
 
-const allowedOrigins = process.env.FRONTEND_DOMAINS?.split(",") || []
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://teazy-tech-seven.vercel.app",
+  "https://teazytech.org"
+]
 
 const corsOptions = {
   origin: function (origin, callback) {
