@@ -224,11 +224,10 @@ const About = () => {
                             </div>
                             <h3>Chelsea Julius</h3>
                             <p className="team-member-role">
-                                Business Assistant and Community Manager
+                               Chief Operations Officer
                             </p>
                             <p className="team-member-bio">
-                                Business assistant and secondary overseer of
-                                TEAZY Tech’s general operations.
+                                Overseer of Teazy Tech's general operations.
                             </p>
                             <div className="team-member-social">
                                 <a href="#" aria-label="LinkedIn">
