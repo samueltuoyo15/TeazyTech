@@ -26,11 +26,42 @@
   box-sizing: border-box;
 }
 
+/* Prevent horizontal scrolling on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--primary-white);
   color: var(--primary-black);
   line-height: 1.6;
+}
+
+/* Ensure all containers don't exceed viewport width */
+* {
+  max-width: 100%;
+}
+
+/* Fix for elements that might cause horizontal scroll */
+img, video, iframe, object, embed {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent text from causing horizontal overflow */
+p, h1, h2, h3, h4, h5, h6, span, div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Fix for pre and code elements */
+pre, code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 h1,
@@ -58,10 +89,12 @@ button {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  overflow-x: hidden; /* Prevent container overflow */
 }
 
 .section {
   padding: 5rem 0;
+  overflow-x: hidden; /* Prevent section overflow */
 }
 
 .btn {
@@ -138,8 +171,42 @@ button {
   align-items: center;
 }
 
+/* Mobile-specific fixes */
 @media (max-width: 768px) {
   .section {
     padding: 3rem 0;
+  }
+  
+  .container {
+    padding: 0 1rem;
+  }
+  
+  /* Ensure no elements extend beyond viewport */
+  * {
+    max-width: 100vw;
+  }
+  
+  /* Fix for any absolute positioned elements */
+  [style*="position: absolute"],
+  [style*="position: fixed"] {
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* Additional mobile overflow fixes */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  /* Ensure buttons don't cause overflow */
+  .btn {
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+  
+  /* Fix for any flex containers that might overflow */
+  .flex {
+    flex-wrap: wrap;
   }
 }

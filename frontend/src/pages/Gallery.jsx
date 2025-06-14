@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import "../styles/Gallery.css";
 import galleryData from "../lib/galleryData";
+import LazyImage from "../components/LazyImage";
 
 const Gallery = () => {
     const [activeFilter, setActiveFilter] = useState("all");
@@ -93,19 +94,15 @@ const Gallery = () => {
                 </div>
             </section>
 
-            {/* Gallery Grid */}
-            <section className="section gallery-grid-section">
+            {/* Gallery Content */}
+            <section className="section gallery-content">
                 <div className="container">
-                    {/*a section for visually segregating the different categories under the "all" filter*/}
                     {activeFilter === "all" ? (
-                        <>
-                            <div className="mb-20">
-                                <h1 className="flex justify-center items-center gap-3 text-lg md:text-xl text-white my-3 mb-6">
-                                    <div className="w-full border-2 border-gray-200"></div>
-                                    <span className="p-2 px-4 rounded-full bg-indigo-500">
-                                        Events
-                                    </span>
-                                    <div className="w-full border-2 border-gray-200"></div>
+                        <div>
+                            {/* Events Section */}
+                            <div className="gallery-category-section">
+                                <h1 className="gallery-category-title">
+                                    Events
                                 </h1>
                                 <div className="gallery-grid">
                                     {filteredItems.map((item) => {
@@ -119,7 +116,7 @@ const Gallery = () => {
                                                     }
                                                 >
                                                     <div className="gallery-item-image">
-                                                        <img
+                                                        <LazyImage
                                                             src={item.images[0]}
                                                             alt={item.title}
                                                         />
@@ -142,18 +139,15 @@ const Gallery = () => {
                                                 </div>
                                             );
                                         }
+                                        return null;
                                     })}
                                 </div>
                             </div>
 
-                            <div className="mb-20">
-                                <h1 className="flex justify-center items-center gap-3 text-lg md:text-xl text-white my-3 mb-6">
-                                    <div className="w-full border-2 border-gray-200"></div>
-
-                                    <span className="p-2 px-4 rounded-full bg-indigo-500">
-                                        Volunteers
-                                    </span>
-                                    <div className="w-full border-2 border-gray-200"></div>
+                            {/* Volunteers Section */}
+                            <div className="gallery-category-section">
+                                <h1 className="gallery-category-title">
+                                    Volunteers
                                 </h1>
                                 <div className="gallery-grid">
                                     {filteredItems.map((item) => {
@@ -167,7 +161,7 @@ const Gallery = () => {
                                                     }
                                                 >
                                                     <div className="gallery-item-image">
-                                                        <img
+                                                        <LazyImage
                                                             src={item.images[0]}
                                                             alt={item.title}
                                                         />
@@ -190,17 +184,15 @@ const Gallery = () => {
                                                 </div>
                                             );
                                         }
+                                        return null;
                                     })}
                                 </div>
                             </div>
 
-                            {/*<div className="mb-20">
-                                <h1 className="flex justify-center items-center gap-3 text-lg md:text-xl text-white my-3 mb-6">
-                                    <div className="w-full border-2 border-gray-200"></div>
-                                    <span className="p-2 px-4 rounded-full bg-indigo-500">
-                                        Testimonials
-                                    </span>
-                                    <div className="w-full border-2 border-gray-200"></div>
+                            {/* Testimonials Section */}
+                            <div className="gallery-category-section">
+                                <h1 className="gallery-category-title">
+                                    Testimonials
                                 </h1>
                                 <div className="gallery-grid">
                                     {filteredItems.map((item) => {
@@ -214,7 +206,7 @@ const Gallery = () => {
                                                     }
                                                 >
                                                     <div className="gallery-item-image">
-                                                        <img
+                                                        <LazyImage
                                                             src={item.images[0]}
                                                             alt={item.title}
                                                         />
@@ -237,17 +229,15 @@ const Gallery = () => {
                                                 </div>
                                             );
                                         }
+                                        return null;
                                     })}
                                 </div>
-                            </div>*/}
+                            </div>
 
-                            <div className="mb-20">
-                                <h1 className="flex justify-center items-center gap-3 text-lg md:text-xl text-white my-3 mb-6">
-                                    <div className="w-full border-2 border-gray-200"></div>
-                                    <span className="p-2 px-4 rounded-full bg-indigo-500">
-                                        Workshops
-                                    </span>
-                                    <div className="w-full border-2 border-gray-200"></div>
+                            {/* Workshops Section */}
+                            <div className="gallery-category-section">
+                                <h1 className="gallery-category-title">
+                                    Workshops
                                 </h1>
                                 <div className="gallery-grid">
                                     {filteredItems.map((item) => {
@@ -261,7 +251,7 @@ const Gallery = () => {
                                                     }
                                                 >
                                                     <div className="gallery-item-image">
-                                                        <img
+                                                        <LazyImage
                                                             src={item.images[0]}
                                                             alt={item.title}
                                                         />
@@ -284,10 +274,11 @@ const Gallery = () => {
                                                 </div>
                                             );
                                         }
+                                        return null;
                                     })}
                                 </div>
                             </div>
-                        </>
+                        </div>
                     ) : (
                         /*the mapping function for filtering e.g events, volunteers*/
                         <div className="gallery-grid">
@@ -298,7 +289,7 @@ const Gallery = () => {
                                     onClick={() => handleClickOnItem(item)}
                                 >
                                     <div className="gallery-item-image">
-                                        <img
+                                        <LazyImage
                                             src={item.images[0]}
                                             alt={item.title}
                                         />
@@ -348,7 +339,7 @@ const Gallery = () => {
                             <i className="fas fa-times"></i>
                         </button>
                         <div className="lightbox-image">
-                            <img
+                            <LazyImage
                                 src={selectedItem.images[index]}
                                 alt={selectedItem.title}
                             />
@@ -367,26 +358,21 @@ const Gallery = () => {
                         </div>
                         {selectedItem.category === "events" ||
                         selectedItem.category === "workshops" ? (
-                            <button
-                                className="lightbox-nav lightbox-prev"
-                                onClick={() => navigateLightbox("prev")}
-                            >
-                                <i className="fas fa-chevron-left"></i>
-                            </button>
-                        ) : (
-                            ""
-                        )}
-                        {selectedItem.category === "events" ||
-                        selectedItem.category === "workshops" ? (
-                            <button
-                                className="lightbox-nav lightbox-next"
-                                onClick={() => navigateLightbox("next")}
-                            >
-                                <i className="fas fa-chevron-right"></i>
-                            </button>
-                        ) : (
-                            ""
-                        )}
+                            <>
+                                <button
+                                    className="lightbox-nav lightbox-prev"
+                                    onClick={() => navigateLightbox("prev")}
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+                                <button
+                                    className="lightbox-nav lightbox-next"
+                                    onClick={() => navigateLightbox("next")}
+                                >
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            </>
+                        ) : null}
                     </div>
                 </div>
             )}
@@ -395,18 +381,18 @@ const Gallery = () => {
             <section className="section gallery-cta">
                 <div className="container">
                     <div className="gallery-cta-content text-center">
-                        <h2>Ready to Upscale?</h2>
+                        <h2>Ready to Transform Your Teaching?</h2>
                         <p>
-                            Contact us to book a free a clarity call and learn
-                            more about how Teazy Tech can transform your
-                            teaching environment.
+                            Join thousands of educators who have already
+                            revolutionized their classrooms with our innovative
+                            EdTech solutions.
                         </p>
                         <div className="gallery-cta-buttons">
-                            <a href="/contact" className="btn btn-primary">
-                                Contact Us
+                            <a href="#" className="btn btn-primary">
+                                Get Started Today
                             </a>
-                            <a href="/services" className="btn btn-outline">
-                                Explore Our Services
+                            <a href="#" className="btn btn-outline">
+                                Learn More
                             </a>
                         </div>
                     </div>

@@ -1,59 +1,58 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../../styles/Home.css";
 import AnimatedSection from "./AnimatedSection";
+import LazyImage from "../LazyImage";
 
 const TestimonialsSection = () => {
-    const testimonialRefs = useRef([]);
-
-    useEffect(() => {
-        const observerOptions = {
-            root: null,
-            rootMargin: "0px",
-            threshold: 0.1,
-        };
-
-        const observerCallback = (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("testimonial-visible");
-                } else {
-                    entry.target.classList.remove("testimonial-visible");
-                }
-            });
-        };
-
-        const observer = new IntersectionObserver(
-            observerCallback,
-            observerOptions
-        );
-
-        testimonialRefs.current.forEach((el) => {
-            if (el) observer.observe(el);
-        });
-
-        return () => {
-            testimonialRefs.current.forEach((el) => {
-                if (el) observer.unobserve(el);
-            });
-        };
-    }, []);
+    const [visibleItems, setVisibleItems] = useState([]);
+    const itemRefs = useRef([]);
 
     const addToRefs = (el, index) => {
-        if (el && !testimonialRefs.current.includes(el)) {
-            testimonialRefs.current[index] = el;
+        if (el && !itemRefs.current.includes(el)) {
+            itemRefs.current[index] = el;
         }
     };
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const index = itemRefs.current.indexOf(entry.target);
+                        if (index !== -1 && !visibleItems.includes(index)) {
+                            setVisibleItems((prev) => [...prev, index]);
+                        }
+                    }
+                });
+            },
+            {
+                threshold: 0.2,
+                rootMargin: "50px",
+            }
+        );
+
+        itemRefs.current.forEach((ref) => {
+            if (ref) observer.observe(ref);
+        });
+
+        return () => {
+            itemRefs.current.forEach((ref) => {
+                if (ref) observer.unobserve(ref);
+            });
+        };
+    }, [visibleItems]);
+
     return (
         <section className="testimonials-section">
-            <AnimatedSection direction="left">
+            <AnimatedSection animation="fade-up">
                 <div className="container">
                     <div className="section-header text-center">
-                        <span className="section-badge">Success Stories</span>
-                        <h2>What Educators Say</h2>
+                        <span className="section-badge">Testimonials</span>
+                        <h2>What Educators Say About Us</h2>
                         <p>
                             Hear from teachers who have transformed their
-                            classrooms with Teazy Tech
+                            classrooms with our EdTech solutions and training
+                            programs.
                         </p>
                     </div>
 
@@ -63,7 +62,7 @@ const TestimonialsSection = () => {
                             ref={(el) => addToRefs(el, 0)}
                         >
                             <div className="testimonial-alt-image">
-                                <img
+                                <LazyImage
                                     src="/images/Teazy tech teachers/Amos happiness.jpg"
                                     alt="Amos Happiness"
                                 />
@@ -89,36 +88,32 @@ const TestimonialsSection = () => {
                         </div>
 
                         <div
-                            className="testimonial-alt-item testimonial-left"
+                            className={`testimonial-alt-item testimonial-left ${
+                                visibleItems.includes(0)
+                                    ? "testimonial-visible"
+                                    : ""
+                            }`}
                             ref={(el) => addToRefs(el, 1)}
                         >
                             <div className="testimonial-alt-content">
                                 <h3>Amoatey Benjamin</h3>
                                 <p className="testimonial-alt-position">
-                                    Ghanian Teacher
+                                    Teacher(Educator)
                                 </p>
                                 <div className="testimonial-alt-text">
-                                    <p className="line-clamp-5">
-                                        "Hi I am Mr. Amoatey Benjamin. A
-                                        professional teacher with Ghana
-                                        Education Service. My love for
-                                        Professional Development led me to Teazy
-                                        Tech Community, online in August 2024. I
-                                        have received so much essential teaching
-                                        resources from the community in the form
-                                        of pictures, videos, facebook posts,
-                                        ebooks and short courses.One Ebook
-                                        dubbed Becoming a Tech Savvy, is one
-                                        resource that has increased my joy for
-                                        joining the Teazy Tech Community. All
-                                        these resources have made teaching &
-                                        learning outcomes so fruitful and
-                                        positive. Thanks to TEAZY TECH. "
+                                    <p>
+                                        "I have been able to create beautiful
+                                        presentations for my lessons using Canva
+                                        and other tools I learned from Teazy
+                                        Tech. My students are more engaged now,
+                                        and I feel more confident in my teaching
+                                        abilities. The training was practical
+                                        and easy to follow."
                                     </p>
                                 </div>
                             </div>
                             <div className="testimonial-alt-image">
-                                <img
+                                <LazyImage
                                     src="/images/Teazy tech teachers/amoatey Benjamin.jpg"
                                     alt="Amoatey Benjamin"
                                 />
