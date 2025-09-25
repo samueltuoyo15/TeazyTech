@@ -15,7 +15,8 @@ const Footer = () => {
                         </div>
                         <p>
                             Empowering educators with cutting-edge knowledge and
-                            tools in educational technology.
+                            tools in educational technologies
+                        .
                         </p>
                     </div>
 
