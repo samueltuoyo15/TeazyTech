@@ -24,7 +24,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`, {
+        const response = await axios.get(`/api/admin/categories`, {
           withCredentials: true
         });
         setCategories(response.data.map(cat => cat.name));
@@ -40,7 +40,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`, {
+        const response = await axios.get(`/api/admin/posts/${id}`, {
           withCredentials: true
         })
         
@@ -102,7 +102,7 @@ const EditPost = () => {
       return
     }
     try {
-      const response = await axios.put(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`, {
+      const response = await axios.put(`/api/admin/posts/${id}`, {
         title,
         excerpt,
         content,

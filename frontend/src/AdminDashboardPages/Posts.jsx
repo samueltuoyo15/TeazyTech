@@ -17,29 +17,33 @@ const Posts = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Predefined categories
-  const categories = ['tech', 'general', 'business', 'entertainment', 'health'];
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`, {
-          withCredentials: true
-        });
-        setPosts(response.data);
-      } catch (err) {
-        setError(err.response?.data?.error || 'Failed to fetch posts');
-        console.error('Error fetching posts:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const [postsRes, categoriesRes] = await Promise.all([
+        axios.get("/api/admin/posts", { withCredentials: true }),
+        axios.get("/api/admin/categories", { withCredentials: true }),
+      ]);
 
-    fetchPosts();
-  }, []);
+      setPosts(postsRes.data);
+      console.log(categoriesRes.data);
+      setCategories(categoriesRes.data);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to fetch data");
+      console.error("Error fetching posts or categories:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -51,7 +55,7 @@ const Posts = () => {
   const handleDelete = async (postId) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        await axios.delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${postId}`, {
+        await axios.delete(`/api/admin/posts/${postId}`, {
           withCredentials: true
         });
         setPosts(posts.filter(post => post.id !== postId));
@@ -130,8 +134,8 @@ const Posts = () => {
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
               <option value="">All Categories</option>
-              {categories.map((category, index) => (
-                <option key={index} value={category}>{category}</option>
+              {categories.map((category) => (
+                <option key={category?.id} value={category?.name}>{category?.name}</option>
               ))}
             </select>
           </div>

@@ -14,9 +14,13 @@ const Blog = () => {
   useEffect(() => {
     const fetchPostsAndCategories = async () => {
       try {
-        const postsResponse = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`)
-        const publishedPosts = postsResponse.data.filter(post => post.status === "published")
-        
+        const postsResponse = await axios.get(`/api/admin/posts`, { withCredentials: true })
+        console.log(postsResponse.data)
+         const posts = Array.isArray(postsResponse.data)
+      ? postsResponse.data
+      : [] 
+        const publishedPosts = posts.filter(post => post.status === "published")
+
         const uniqueCategories = ["All Categories", ...new Set(publishedPosts.map(post => post.category))]
         
         setBlogPosts(publishedPosts)
@@ -35,7 +39,7 @@ const Blog = () => {
     e.preventDefault()
     
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${postId}/view`)
+      await axios.post(`/api/posts/${postId}/view`)
       navigate(`/blog/${postId}`)
     } catch (error) {
       console.error("Error tracking view:", error)

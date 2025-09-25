@@ -21,7 +21,7 @@ const CreatePost = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`, {
+        const response = await axios.get(`/api/admin/categories`, {
           withCredentials: true
         });
         setCategories(response.data.map(cat => cat.name));
@@ -69,7 +69,7 @@ const CreatePost = () => {
     }
     
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/create-post`, {
+      const response = await axios.post(`/api/admin/create-post`, {
         title, excerpt, content, category, thumbnail, status, published_date: new Date().toISOString()
       }, { withCredentials: true })
       

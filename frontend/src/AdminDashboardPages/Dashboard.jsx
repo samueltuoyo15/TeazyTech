@@ -23,7 +23,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`, {
+        const response = await axios.get(`/api/admin/posts`, {
           withCredentials: true
         });
         setRecentPosts(response.data);

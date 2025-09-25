@@ -16,7 +16,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`, {
+        const response = await axios.get(`/api/admin/categories`, {
           withCredentials: true
         });
         setCategories(response.data);
@@ -45,7 +45,7 @@ const Categories = () => {
     if (!editedCategory.name.trim()) return;
     
     try {
-      await axios.put(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories/${id}`, 
+      await axios.put(`/api/admin/categories/${id}`, 
         editedCategory,
         { withCredentials: true }
       );
@@ -64,7 +64,7 @@ const Categories = () => {
   const deleteCategory = async (id) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        await axios.delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories/${id}`, {
+        await axios.delete(`/api/admin/categories/${id}`, {
           withCredentials: true
         });
         setCategories(categories.filter(cat => cat.id !== id));
@@ -88,7 +88,7 @@ const Categories = () => {
     if (!newCategory.name.trim()) return;
     
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/categories`,
+      const response = await axios.post(`/api/admin/categories`,
         newCategory,
         { withCredentials: true }
       );

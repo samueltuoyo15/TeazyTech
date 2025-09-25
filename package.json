@@ -1,13 +1,13 @@
 {
   "name": "backend-admin",
   "version": "1.0.0",
-  "main": "admin.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node admin.js"
+    "start": "node server.js"
   },
   "type": "module",
   "keywords": [],
-  "author": "Samuel Tuoyo",
+  "author": "Samuel Tuoyo & Abiola Azeez",
   "license": "ISC",
   "description": "",
   "dependencies": {

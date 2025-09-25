@@ -11,7 +11,7 @@ const BlogPreview = () => {
     useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const postsResponse = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts`)
+        const postsResponse = await axios.get(`/api/admin/posts`)
         const publishedPosts = postsResponse.data.filter(post => post.status === "published")
         setBlogPosts(publishedPosts)
       } catch (err) {
@@ -28,7 +28,7 @@ const BlogPreview = () => {
       e.preventDefault()
       
       try {
-        await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${postId}/view`)
+        await axios.post(`/api/posts/${postId}/view`)
         navigate(`/blog/${postId}`)
       } catch (error) {
         console.error("Error tracking view:", error)

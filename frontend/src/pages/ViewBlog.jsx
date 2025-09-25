@@ -15,7 +15,7 @@ const ViewBlog = () => {
     const fetchData = async () => {
       try {
         await axios.post(
-          `${import.meta.env.VITE_BACKEND_DOMAIN}/api/posts/${id}/view`,
+          `/api/posts/${id}/view`,
           {}, 
           {
             headers: { "Content-Type": "application/json" },
@@ -24,7 +24,7 @@ const ViewBlog = () => {
         ).catch(e => console.warn("View tracking failed:", e.message));
 
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/posts/${id}`,
+          `/api/admin/posts/${id}`,
           {
             headers: { "Content-Type": "application/json" }
           }

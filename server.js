@@ -3,9 +3,10 @@ import express from "express"
 import admin from "firebase-admin"
 import cookieParser from "cookie-parser"
 import fetch from "node-fetch"
-import cors from "cors"
 import helmet from "helmet"
 import pino from "pino"
+import { fileURLToPath } from "url"
+import path from "path"
 import Joi from "joi"
 import dotenv from "dotenv"
 dotenv.config()
@@ -54,63 +55,39 @@ const globalLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again later'
 })
 
+app.use(globalLimiter)
 const endpointLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
   message: 'Too many view requests'
 })
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://teazy-tech.vercel.app",
-  "https://teazy-tech-seven.vercel.app",
-  "www.teazytech.org",
-  "https://teazytech.org"
-]
 
-const corsOptions = {
-  origin: function (origin, callback) {
-  if (!origin) return callback(null, true)
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['set-cookie'],
-  maxAge: 86400 
-}
-
-app.use(helmet())
-app.use(cors(corsOptions))
-app.use(globalLimiter)
-app.options('/*', cors(corsOptions))
-
-app.use((req, res, next) => {
-  res.header('X-Content-Type-Options', 'nosniff')
-  res.header('X-Frame-Options', 'DENY')
-  res.header('X-XSS-Protection', '1; mode=block')
-  res.header('Referrer-Policy', 'same-origin')
-  next()
-})
-
-app.use("/*", (req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', req.headers.origin)
-    res.header('Access-Control-Allow-Credentials', 'true')
-    res.status(200).end()
-    return
-  }
-  next()
-})
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "https:"],
+        imgSrc: ["'self'", "data:", "*"],
+        connectSrc: ["'self'", "https:"],
+        fontSrc: ["'self'", "https:"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+  })
+)
 
 app.use(express.json({ limit: '10kb' }))
 app.use(cookieParser())
+app.use(express.urlencoded({ extended: true }))
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+app.use(express.static(path.join(__dirname, "frontend", "dist")))
 logger.info("Initializing Firebase Admin SDK...")
 
 let db
@@ -142,6 +119,7 @@ const updateUserStats = async (userId, amount) => {
     })
   })
 }
+
 
 
 app.post("/api/admin/login", endpointLimiter, async (req, res) => {
@@ -191,7 +169,7 @@ app.post("/api/admin/login", endpointLimiter, async (req, res) => {
       secure: process.NODE_ENV === "production", 
       maxAge: 3600 * 1000,
       path: "/",
-      sameSite: "none",
+      sameSite: "strict",
       partitioned: true  
     })
     return res.json({  
@@ -240,7 +218,7 @@ app.post("/api/admin/logout", (req, res) => {
   httpOnly: true,
   secure: process.NODE_ENV === "production",
   path: "/",
-  sameSite: "none"
+  sameSite: "strict"
 })
   return res.json({ message: "Logged out" })
 })
@@ -754,6 +732,10 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
       message: process.env.NODE_ENV === 'development' ? error.message : undefined
     })
   }
+})
+
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"))
 })
 
 app.use((err, req, res, next) => {
