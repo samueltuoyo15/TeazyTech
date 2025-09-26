@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "build": "cd ./frontend && npm install && npm run build",
-     "vercel-build": "npm run build"
+     "vercel-build": "npm run build && npm run start"
   },
   "type": "module",
   "keywords": [],
