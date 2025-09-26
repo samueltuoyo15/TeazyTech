@@ -9,6 +9,7 @@ import { fileURLToPath } from "url"
 import path from "path"
 import Joi from "joi"
 import dotenv from "dotenv"
+import serverless from "serverless-http"
 dotenv.config()
 
 const postSchema = Joi.object({
@@ -747,5 +748,4 @@ app.use((err, req, res, next) => {
 })
 
 
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
+export const handler = serverless(app)
