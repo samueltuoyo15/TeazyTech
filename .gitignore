@@ -1,5 +1,4 @@
 node_modules/
 .env
-dist/
 make-admin.js
 pass.txt

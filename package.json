@@ -2,11 +2,9 @@
   "name": "backend-admin",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "build": "cd ./frontend && npm install && npm run build",
-    "vercel-build": "npm run build"
-  },
+"scripts": {
+  "dev": "node server.js"
+},
   "type": "module",
   "keywords": [],
   "author": "Samuel Tuoyo & Abiola Azeez",

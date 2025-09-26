@@ -88,7 +88,7 @@ app.use(express.urlencoded({ extended: true }))
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-app.use(express.static(path.join(__dirname, "frontend", "dist")))
+app.use(express.static(path.join(__dirname, "dist")))
 logger.info("Initializing Firebase Admin SDK...")
 
 let db
@@ -736,7 +736,7 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res) => {
 })
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"))
+  res.sendFile(path.join(__dirname, "dist", "index.html"))
 })
 
 app.use((err, req, res, next) => {
