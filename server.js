@@ -8,6 +8,7 @@ import pino from "pino"
 import { fileURLToPath } from "url"
 import path from "path"
 import Joi from "joi"
+import serverless from "serverless-http" 
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -166,7 +167,7 @@ app.post("/api/admin/login", endpointLimiter, async (req, res) => {
     const userData = adminDoc.data()  
     res.cookie("accessToken", data.idToken, {
       httpOnly: true,
-      secure: process.NODE_ENV === "production", 
+      secure: process.env.NODE_ENV === "production", 
       maxAge: 3600 * 1000,
       path: "/",
       sameSite: "strict",
@@ -216,7 +217,7 @@ app.get("/api/admin/me", async (req, res) => {
 app.post("/api/admin/logout", (req, res) => {
   res.clearCookie("accessToken", {
   httpOnly: true,
-  secure: process.NODE_ENV === "production",
+  secure: process.env.NODE_ENV === "production",
   path: "/",
   sameSite: "strict"
 })
@@ -747,5 +748,8 @@ app.use((err, req, res, next) => {
 })
 
 
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
+// const PORT = process.env.PORT || 5000
+// app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
+
+export const handler = serverless(app)
+export default handler
