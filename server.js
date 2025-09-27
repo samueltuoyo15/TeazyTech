@@ -755,8 +755,5 @@ app.use((err, req, res, next) => {
 })
 
 
-// const PORT = process.env.PORT || 5000
-// app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
-
-export const handler = serverless(app)
-export default handler
+const PORT = process.env.PORT || 5000
+app.listen(PORT, () => logger.info(`Server running on port ${PORT}`))
