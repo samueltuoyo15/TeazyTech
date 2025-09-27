@@ -34,17 +34,7 @@ const getClientIp = (req) => {
   return req.ip || req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
 }
 
-const logger = pino({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  ...(process.env.NODE_ENV !== 'production' && {
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        colorize: true
-      }
-    }
-  })
-})
+const logger = pino()
 
 const app = express()
 
