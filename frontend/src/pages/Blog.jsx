@@ -9,35 +9,48 @@ const Blog = () => {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalPosts, setTotalPosts] = useState(0)
+  const postsPerPage = 10
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchPostsAndCategories = async () => {
-      try {
-        const postsResponse = await axios.get(`/api/admin/posts`, { withCredentials: true })
-        console.log(postsResponse.data)
-         const posts = Array.isArray(postsResponse.data)
-      ? postsResponse.data
-      : [] 
-        const publishedPosts = posts.filter(post => post.status === "published")
-
+  const fetchPosts = async (page = 1) => {
+    setLoading(true)
+    try {
+      const response = await axios.get(`/api/admin/posts/pagination`, {
+        params: { page, limit: postsPerPage },
+        withCredentials: true
+      })
+      const { posts, pagination } = response.data
+      const publishedPosts = posts.filter(post => post.status === "published")
+      
+      setBlogPosts(publishedPosts)
+      setCurrentPage(pagination.currentPage)
+      setTotalPages(pagination.totalPages)
+      setTotalPosts(pagination.total)
+      
+      if (page === 1) {
         const uniqueCategories = ["All Categories", ...new Set(publishedPosts.map(post => post.category))]
-        
-        setBlogPosts(publishedPosts)
         setCategories(uniqueCategories)
-      } catch (err) {
-        console.error("Error fetching data:", err)
-      } finally {
-        setLoading(false)
       }
+    } catch (err) {
+      console.error("Error fetching data:", err)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    fetchPostsAndCategories()
-  }, [])
+  useEffect(() => {
+    fetchPosts(currentPage)
+  }, [currentPage])
+
+  useEffect(() => {
+    window.scroll({ top: 0, left: 0, behavior: "smooth" })
+  }, [currentPage])
 
   const trackPostView = async (postId, e) => {
     e.preventDefault()
-    
     try {
       await axios.post(`/api/posts/${postId}/view`)
       navigate(`/blog/${postId}`)
@@ -49,15 +62,20 @@ const Blog = () => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category)
+    setCurrentPage(1)
   }
 
   const handleSearch = (e) => {
     e.preventDefault()
-   console.log("Searching for:", searchQuery)
+    setCurrentPage(1)
   }
-     useEffect(() => {
-        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
-    }, [])
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = selectedCategory === "All Categories" || post.category === selectedCategory
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -128,12 +146,52 @@ const Blog = () => {
                 </div>
               )}
 
-              {filteredPosts.length > 0 && (
+              {totalPosts > postsPerPage && (
                 <div className="blog-pagination">
-                  <button className="pagination-btn active">1</button>
-                  <button className="pagination-btn">2</button>
-                  <button className="pagination-btn">3</button>
-                  <button className="pagination-btn pagination-next">
+                  <button 
+                    className="pagination-btn pagination-prev"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <i className="fas fa-arrow-left"></i> Prev
+                  </button>
+                  
+                  {[...Array(totalPages)].map((_, i) => {
+                    const page = i + 1
+                    if (totalPages <= 5) {
+                      return (
+                        <button
+                          key={page}
+                          className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                          onClick={() => handlePageChange(page)}
+                        >
+                          {page}
+                        </button>
+                      )
+                    }
+                    if (page === 1 || page === totalPages || 
+                        (page >= currentPage - 1 && page <= currentPage + 1)) {
+                      return (
+                        <button
+                          key={page}
+                          className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                          onClick={() => handlePageChange(page)}
+                        >
+                          {page}
+                        </button>
+                      )
+                    }
+                    if (page === currentPage - 2 || page === currentPage + 2) {
+                      return <span key={page} className="pagination-ellipsis">...</span>
+                    }
+                    return null
+                  })}
+                  
+                  <button 
+                    className="pagination-btn pagination-next"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
                     Next <i className="fas fa-arrow-right"></i>
                   </button>
                 </div>

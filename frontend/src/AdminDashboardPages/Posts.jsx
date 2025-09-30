@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import Layout from '../components/Layout'
+import axios from 'axios'
 import { 
   PlusCircle, 
   Search, 
@@ -10,60 +10,57 @@ import {
   Eye, 
   Filter,
   Calendar
-} from 'lucide-react';
+} from 'lucide-react'
 
 const Posts = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [posts, setPosts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+  const [searchTerm, setSearchTerm] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [posts, setPosts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [postsRes, categoriesRes] = await Promise.all([
-        axios.get("/api/admin/posts", { withCredentials: true }),
-        axios.get("/api/admin/categories", { withCredentials: true }),
-      ]);
-
-      setPosts(postsRes.data);
-      console.log(categoriesRes.data);
-      setCategories(categoriesRes.data);
-    } catch (err) {
-      setError(err.response?.data?.error || "Failed to fetch data");
-      console.error("Error fetching posts or categories:", err);
-    } finally {
-      setLoading(false);
+    const fetchData = async () => {
+      try {
+        const [postsRes, categoriesRes] = await Promise.all([
+          axios.get("/api/admin/posts", { withCredentials: true }),
+          axios.get("/api/admin/categories", { withCredentials: true })
+        ])
+        console.log("fetched posts", postsRes.data)
+        setPosts(postsRes.data || [])
+        setCategories(categoriesRes.data || [])
+      } catch (err) {
+        setError(err.response?.data?.error || "Failed to fetch data")
+        console.error("Error fetching posts or categories:", err)
+      } finally {
+        setLoading(false)
+      }
     }
-  };
 
-  fetchData();
-}, []);
-
+    fetchData()
+  }, [])
 
   const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || post.category === categoryFilter;
-    const matchesStatus = !statusFilter || post.status === statusFilter;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = !categoryFilter || post.category === categoryFilter
+    const matchesStatus = !statusFilter || post.status === statusFilter
+    return matchesSearch && matchesCategory && matchesStatus
+  })
 
   const handleDelete = async (postId) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
         await axios.delete(`/api/admin/posts/${postId}`, {
           withCredentials: true
-        });
-        setPosts(posts.filter(post => post.id !== postId));
+        })
+        setPosts(posts.filter(post => post.id !== postId))
       } catch (err) {
-        alert(err.response?.data?.error || 'Failed to delete post');
+        alert(err.response?.data?.error || 'Failed to delete post')
       }
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -72,7 +69,7 @@ const Posts = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e94235]"></div>
         </div>
       </Layout>
-    );
+    )
   }
 
   if (error) {
@@ -91,7 +88,7 @@ const Posts = () => {
           </div>
         </div>
       </Layout>
-    );
+    )
   }
 
   return (
@@ -119,7 +116,6 @@ const Posts = () => {
         </Link>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-lg shadow mb-6 p-4">
         <div className="flex items-center mb-4">
           <Filter className="h-5 w-5 text-gray-500 mr-2" />
@@ -154,7 +150,6 @@ const Posts = () => {
         </div>
       </div>
 
-      {/* Posts Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -209,7 +204,7 @@ const Posts = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-500">
                         <Calendar className="h-4 w-4 mr-1" />
-                        {new Date(post.published_date).toLocaleDateString()}
+                        {post.published_date}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -257,7 +252,7 @@ const Posts = () => {
         </div>
       </div>
     </Layout>
-  );
-};
+  )
+}
 
-export default Posts;
+export default Posts

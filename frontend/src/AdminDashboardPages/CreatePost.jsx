@@ -1,106 +1,152 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
-import { Image, Calendar, Tag, AlertTriangle } from 'lucide-react';
-import RichTextEditor from '../components/RichTextEditor';
-import axios from "axios"
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Layout from '../components/Layout'
+import { Image, Tag, AlertTriangle } from 'lucide-react'
+import RichTextEditor from '../components/RichTextEditor'
+import axios from 'axios'
+import { z } from 'zod'
+import { toast, Toaster } from 'sonner'
+
+const postSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required'),
+  content: z.string().min(1, 'Content is required'),
+  excerpt: z.string().trim().min(1, 'Excerpt is required'),
+  category: z.string().trim().min(1, 'Category is required'),
+  status: z.enum(['draft', 'published'])
+})
 
 const CreatePost = () => {
-  const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [category, setCategory] = useState('');
-  const [thumbnail, setThumbnail] = useState('');
-  const [thumbnailPreview, setThumbnailPreview] = useState('');
-  const [status, setStatus] = useState('draft');
-  const [errors, setErrors] = useState({});
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const navigate = useNavigate()
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [excerpt, setExcerpt] = useState('')
+  const [category, setCategory] = useState('')
+  const [thumbnail, setThumbnail] = useState(null)
+  const [thumbnailPreview, setThumbnailPreview] = useState('')
+  const [status, setStatus] = useState('draft')
+  const [errors, setErrors] = useState({})
+  const [categories, setCategories] = useState([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`/api/admin/categories`, {
+        const response = await axios.get('/api/admin/categories', {
           withCredentials: true
-        });
-        setCategories(response.data.map(cat => cat.name));
+        })
+        setCategories(response.data.map(cat => cat.name))
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        console.error('Error fetching categories:', err)
+        toast.error('Failed to load categories')
       } finally {
-        setLoadingCategories(false);
+        setLoadingCategories(false)
       }
-    };
-    fetchCategories();
-  }, []);
+    }
+    fetchCategories()
+  }, [])
 
   const handleThumbnailChange = (e) => {
-    const url = e.target.value;
-    setThumbnail(url);
-    setThumbnailPreview(url);
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!title.trim()) newErrors.title = 'Title is required';
-    if (!content.trim()) newErrors.content = 'Content is required';
-    if (!category) {
-      if (categories.length === 0) {
-        newErrors.category = 'No categories available. Please add categories first.';
-      } else {
-        newErrors.category = 'Category is required';
-      }
+    const file = e.target.files[0]
+    if (file && file.type.startsWith('image/')) {
+      setThumbnail(file)
+      const reader = new FileReader()
+      reader.onload = () => setThumbnailPreview(reader.result)
+      reader.readAsDataURL(file)
+    } else {
+      setThumbnail(null)
+      setThumbnailPreview('')
+      if (file) toast.error('Please upload a valid image file')
     }
+  }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const clearError = (field) => {
+    setErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors[field]
+      return newErrors
+    })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!validateForm()) {
-      if (categories.length === 0) {
-        alert("No categories available. Please add categories before creating posts.");
-        navigate('/categories');
-      }
-      return;
+    const trimmedTitle = title.trim()
+    const trimmedExcerpt = excerpt.trim()
+    const trimmedCategory = category.trim()
+    const isContentEmpty = !content || content.replace(/<[^>]*>/g, '').trim() === ''
+
+    if (!thumbnail) {
+      setErrors(prev => ({ ...prev, thumbnail: 'Thumbnail is required' }))
+      toast.error('Please upload a thumbnail image')
+      return
     }
-    
+
+    const validation = postSchema.safeParse({
+      title: trimmedTitle,
+      content: isContentEmpty ? '' : content,
+      excerpt: trimmedExcerpt,
+      category: trimmedCategory,
+      status
+    })
+
+    if (!validation.success) {
+      const fieldErrors = {}
+      validation.error.errors.forEach(err => {
+        fieldErrors[err.path[0]] = err.message
+      })
+      setErrors(fieldErrors)
+      toast.error('Please fix the errors below')
+      return
+    }
+
+    setErrors(prev => {
+      const { thumbnail, ...rest } = prev
+      return rest
+    })
+
     try {
-      const response = await axios.post(`/api/admin/create-post`, {
-        title, excerpt, content, category, thumbnail, status, published_date: new Date().toISOString()
-      }, { withCredentials: true })
-      
-      if(response.status === 201) {
-        alert(`Post "${title}" created successfully!`);
-        navigate('/posts', { replace: true, reloadDocument: true })
-        return 
+      const formData = new FormData()
+      formData.append('title', title)
+      formData.append('excerpt', excerpt)
+      formData.append('content', content)
+      formData.append('category', category)
+      formData.append('status', status)
+      formData.append('published_date', new Date().toISOString())
+      formData.append('thumbnail', thumbnail)
+
+      const response = await axios.post('/api/admin/create-post', formData, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      if (response.status === 201) {
+        toast.success(`Post "${title}" created successfully!`)
+        navigate('/posts', { replace: true })
+        return
       }
-      
+
       throw new Error(response.data?.error)
-    } catch(error) {
-      console.error("Post creation error:", error);
-    
+    } catch (error) {
+      console.error('Post creation error:', error)
       if (error.response?.data?.errors) {
         const backendErrors = error.response.data.errors.reduce((acc, err) => {
-          acc[err.field] = err.message;
-          return acc;
-        }, {});
-        setErrors(backendErrors);
+          acc[err.field] = err.message
+          return acc
+        }, {})
+        setErrors(backendErrors)
+        toast.error('Validation failed')
       } else {
-        alert(
-          error.response?.data?.error || 
-          error.response?.data?.message || 
-          "Failed to create post. Check console for details."
-        );
+        const msg = error.response?.data?.error || 
+                    error.response?.data?.message || 
+                    'Failed to create post'
+        toast.error(msg)
       }
     }
-  };
+  }
 
   return (
     <Layout title="Create Post">
+      <Toaster richColors position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <div className="px-6 py-4 bg-[#e94235] text-white">
@@ -116,7 +162,10 @@ const CreatePost = () => {
                 id="title"
                 className={`w-full px-3 py-2 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setTitle(e.target.value)
+                  clearError('title')
+                }}
                 placeholder="Enter post title"
               />
               {errors.title && (
@@ -129,16 +178,25 @@ const CreatePost = () => {
 
             <div className="mb-6">
               <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 mb-1">
-                Excerpt
+                Excerpt <span className="text-red-500">*</span>
               </label>
               <textarea
                 id="excerpt"
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
+                className={`w-full px-3 py-2 border ${errors.excerpt ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
                 value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="Brief summary of the post (optional)"
+                onChange={(e) => {
+                  setExcerpt(e.target.value)
+                  clearError('excerpt')
+                }}
+                placeholder="Brief summary of the post"
               ></textarea>
+              {errors.excerpt && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {errors.excerpt}
+                </p>
+              )}
             </div>
 
             <div className="mb-6">
@@ -148,7 +206,10 @@ const CreatePost = () => {
               <div className={errors.content ? 'border border-red-500 rounded-md' : ''}>
                 <RichTextEditor
                   value={content}
-                  onChange={setContent}
+                  onChange={(val) => {
+                    setContent(val)
+                    clearError('content')
+                  }}
                 />
               </div>
               {errors.content && (
@@ -180,7 +241,10 @@ const CreatePost = () => {
                       id="category"
                       className={`w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      onChange={(e) => {
+                        setCategory(e.target.value)
+                        clearError('category')
+                      }}
                       disabled={categories.length === 0}
                     >
                       <option value="">Select a category</option>
@@ -247,15 +311,17 @@ const CreatePost = () => {
               <div className="mb-4">
                 <label htmlFor="thumbnail" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <Image className="h-4 w-4 mr-1" />
-                  Thumbnail URL
+                  Upload Thumbnail
                 </label>
                 <input
-                  type="text"
+                  type="file"
                   id="thumbnail"
+                  accept="image/*"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
-                  value={thumbnail}
-                  onChange={handleThumbnailChange}
-                  placeholder="Enter image URL"
+                  onChange={(e) => {
+                    handleThumbnailChange(e)
+                    clearError('thumbnail')
+                  }}
                 />
               </div>
               
@@ -272,8 +338,8 @@ const CreatePost = () => {
                       type="button"
                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
                       onClick={() => {
-                        setThumbnail('');
-                        setThumbnailPreview('');
+                        setThumbnail(null)
+                        setThumbnailPreview('')
                       }}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -285,8 +351,14 @@ const CreatePost = () => {
                   <div className="text-center">
                     <Image className="mx-auto h-12 w-12 text-gray-400" />
                     <p className="mt-1 text-sm text-gray-500">Add a thumbnail image for your post</p>
-                    <p className="text-xs text-gray-400">Enter a URL in the field above</p>
+                    <p className="text-xs text-gray-400">Upload an image using the field above</p>
                   </div>
+                )}
+                {errors.thumbnail && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.thumbnail}
+                  </p>
                 )}
               </div>
             </div>
@@ -311,7 +383,7 @@ const CreatePost = () => {
         </div>
       </form>
     </Layout>
-  );
-};
+  )
+}
 
-export default CreatePost;
+export default CreatePost

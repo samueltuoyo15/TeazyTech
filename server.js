@@ -8,9 +8,34 @@ import pino from "pino"
 import { fileURLToPath } from "url"
 import path from "path"
 import Joi from "joi"
-import serverless from "serverless-http" 
 import dotenv from "dotenv"
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+
 dotenv.config()
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Configure multer to use Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "thumbnails", // Folder name in Cloudinary
+    allowed_formats: ["jpg", "jpeg", "webp", "gif", "png"],
+    transformation: [{ width: 800, height: 600, crop: "limit" }],
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 2MB
+});
 
 const postSchema = Joi.object({
   title: Joi.string().required().min(1).max(100),
@@ -76,8 +101,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "https:"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:", "*"],
         connectSrc: ["'self'", "https:"],
         fontSrc: ["'self'", "https:"],
@@ -232,65 +257,59 @@ app.post("/api/admin/logout", (req, res) => {
 })
 
 
-app.post("/api/admin/create-post", async (req, res) => {
-  const token = req.cookies.accessToken
-  logger.debug("Create post request received", {
-    headers: req.headers,
-    cookies: req.cookies,
-    body: req.body
-  })
-
+app.post("/api/admin/create-post", upload.single("thumbnail"), async (req, res) => {
+  const token = req.cookies.accessToken;
   if (!token) {
-    logger.warn("Unauthorized create post attempt - No token provided")
-    return res.status(401).json({ error: "Unauthorized" })
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token)
-    const user = await admin.auth().getUser(decoded.uid)
-    const isAdmin = user.customClaims?.admin === true
+    const decoded = await admin.auth().verifyIdToken(token);
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
 
-    if (!isAdmin) {  
-      return res.status(403).json({ error: "Admin access required" })  
-    }  
+    if (!isAdmin) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
 
-    const { error, value } = postSchema.validate(req.body, {   
-      abortEarly: false,  
-      allowUnknown: false  
-    })  
+    const { error, value } = postSchema.validate(req.body, {
+      abortEarly: false,
+      allowUnknown: true, // Allow unknown fields for file data
+    });
 
-    if (error) {  
-      const errors = error.details.map(detail => ({  
-        field: detail.path[0],  
-        message: detail.message.replace(/"/g, ""),  
-        type: detail.type  
-      }))  
-      return res.status(400).json({ errors })  
-    }  
+    if (error) {
+      const errors = error.details.map((detail) => ({
+        field: detail.path[0],
+        message: detail.message.replace(/"/g, ""),
+        type: detail.type,
+      }));
+      return res.status(400).json({ errors });
+    }
 
-    const postData = {  
-      ...value,  
-      author_id: user.uid,  
-      created_at: admin.firestore.FieldValue.serverTimestamp(),  
-      updated_at: admin.firestore.FieldValue.serverTimestamp()  
-    }  
+    const postData = {
+      ...value,
+      thumbnail: req.file ? req.file.path : null, // Save Cloudinary URL
+      author_id: user.uid,
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp(),
+    };
 
-    const postRef = await db.collection("posts").add(postData)  
-    await updateUserStats(user.uid, 1)  
-    
-    return res.status(201).json({  
-      message: "Post created successfully",  
-      postId: postRef.id,  
-      ...postData  
-    })
+    const postRef = await db.collection("posts").add(postData);
+    await updateUserStats(user.uid, 1);
+
+    return res.status(201).json({
+      message: "Post created successfully",
+      postId: postRef.id,
+      ...postData,
+    });
   } catch (error) {
-    logger.error("Post creation failed", error)
     return res.status(500).json({
       error: "Post creation failed",
-      message: error.message
-    })
+      message: error.message,
+    });
   }
 })
+
 
 app.get("/api/admin/posts", async (req, res) => {
   try {
@@ -339,6 +358,93 @@ app.get("/api/admin/posts", async (req, res) => {
     })
 
     return res.json(posts)
+  } catch (error) {
+    logger.error("Failed to fetch posts", error)
+    return res.status(500).json({
+      error: "Failed to fetch posts",
+      message: error.message
+    })
+  }
+})
+
+
+app.get("/api/admin/posts/pagination", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const offset = (page - 1) * limit
+
+    if (page < 1 || limit < 1 || limit > 100) {
+      return res.status(400).json({ error: "Invalid page or limit. Limit must be between 1 and 100." })
+    }
+
+    // Get total count first
+    const totalCountSnapshot = await db.collection("posts").get()
+    const totalCount = totalCountSnapshot.size
+
+    // Fetch paginated posts
+    const postsSnapshot = await db
+      .collection("posts")
+      .orderBy("updated_at", "desc")
+      .offset(offset)
+      .limit(limit)
+      .get()
+
+    const posts = postsSnapshot.docs.map(doc => {
+      const data = doc.data()
+      const publishedDate = data.updated_at?.toDate?.() || null
+
+      const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" })
+      
+      const getTimeUnit = (seconds) => {
+        const units = [
+          { value: 31536000, unit: "year" },
+          { value: 2592000, unit: "month" },
+          { value: 604800, unit: "week" },
+          { value: 86400, unit: "day" },
+          { value: 3600, unit: "hour" },
+          { value: 60, unit: "minute" },
+          { value: 1, unit: "second" }
+        ]
+        for (const { value, unit } of units) {
+          if (seconds >= value) {
+            return { value: Math.floor(seconds / value), unit }
+          }
+        }
+        return { value: 0, unit: "second" }
+      }
+    
+      const timeAgo = publishedDate ? (() => {
+        const secondsAgo = Math.floor((Date.now() - publishedDate.getTime()) / 1000)
+        const { value, unit } = getTimeUnit(secondsAgo)
+        return rtf.format(-value, unit)
+      })() : "Unknown time"
+    
+      const formattedDate = publishedDate ? new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(publishedDate) : null
+    
+      return {
+        id: doc.id,
+        ...data,
+        published_date: formattedDate,
+        timeAgo
+      }
+    })
+
+    return res.json({
+      posts,
+      pagination: {
+        currentPage: page,
+        perPage: limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNext: page < Math.ceil(totalCount / limit),
+        hasPrev: page > 1
+      }
+    })
   } catch (error) {
     logger.error("Failed to fetch posts", error)
     return res.status(500).json({
