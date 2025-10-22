@@ -82,6 +82,7 @@ const BlogPreview = () => {
             <div className="blog-card-content">
               <div className="blog-card-date">{post.published_date}</div>
               <h3>{post.title}</h3>
+              <strong className="font-semibold italic">{post.author}</strong>
               <p>{post.excerpt}</p>
                 <Link to={`/blog/${post.id}`} onClick={(e) => trackPostView(post.id, e)}>
                    Read More

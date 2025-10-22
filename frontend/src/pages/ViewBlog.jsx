@@ -34,6 +34,7 @@ const ViewBlog = () => {
         if (response.data.status !== "published") throw new Error("Post not published");
         
         setPost({
+          author: response.data.author || "Unauthored post",
           title: response.data.title || "Untitled Post",
           content: response.data.content || "<p>Content not available</p>",
           thumbnail: response.data.thumbnail || "",
@@ -70,6 +71,7 @@ const ViewBlog = () => {
         <div className="header-content">
           <h1 className="blog-title">{post.title}</h1>
           <div className="blog-meta">
+             <h3 className="blog-author">Author: {post.author}</h3>
             <span className="publish-date">
              {post?.published_date || "Date not available"}
             </span>

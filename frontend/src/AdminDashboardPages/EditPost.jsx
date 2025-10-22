@@ -10,6 +10,7 @@ const EditPost = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
   const [content, setContent] = useState('')
   const [excerpt, setExcerpt] = useState('')
   const [category, setCategory] = useState('')
@@ -46,6 +47,7 @@ const EditPost = () => {
         
         const post = response.data
         setTitle(post.title)
+        setAuthor(post.author)
         setContent(post.content || '')
         setExcerpt(post.excerpt || '')
         setCategory(post.category)
@@ -77,6 +79,7 @@ const EditPost = () => {
   const validateForm = () => {
     const newErrors = {}
     
+    if (!author.trim()) newErrors.author = 'Author is required'
     if (!title.trim()) newErrors.title = 'Title is required'
     if (!content.trim()) newErrors.content = 'Content is required'
     if (!category) {
@@ -103,6 +106,7 @@ const EditPost = () => {
     }
     try {
       const response = await axios.put(`/api/admin/posts/${id}`, {
+        author,
         title,
         excerpt,
         content,
@@ -183,6 +187,20 @@ const formats = [
                   {errors.title}
                 </p>
               )}
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">
+                Author name
+              </label>
+              <textarea
+                id="author"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="Author name"
+              ></textarea>
             </div>
 
             <div className="mb-6">

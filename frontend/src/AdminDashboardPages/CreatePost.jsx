@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { toast, Toaster } from 'sonner'
 
 const postSchema = z.object({
+  author: z.string().trim().min(4, "Author name is required"),
   title: z.string().trim().min(1, 'Title is required'),
   content: z.string().min(1, 'Content is required'),
   excerpt: z.string().trim().min(1, 'Excerpt is required'),
@@ -17,6 +18,7 @@ const postSchema = z.object({
 
 const CreatePost = () => {
   const navigate = useNavigate()
+  const [author, setAuthor] = useState('')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [excerpt, setExcerpt] = useState('')
@@ -107,6 +109,7 @@ const CreatePost = () => {
     try {
       const formData = new FormData()
       formData.append('title', title)
+      formData.append('author', author)
       formData.append('excerpt', excerpt)
       formData.append('content', content)
       formData.append('category', category)
@@ -172,6 +175,29 @@ const CreatePost = () => {
                 <p className="mt-1 text-sm text-red-600 flex items-center">
                   <AlertTriangle className="h-4 w-4 mr-1" />
                   {errors.title}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">
+                Author name <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="author"
+                rows={3}
+                className={`w-full px-3 py-2 border ${errors.author ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
+                value={author}
+                onChange={(e) => {
+                  setAuthor(e.target.value)
+                  clearError('author')
+                }}
+                placeholder="Brief summary of the post"
+              ></textarea>
+              {errors.author && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {errors.author}
                 </p>
               )}
             </div>

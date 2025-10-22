@@ -38,6 +38,7 @@ const upload = multer({
 });
 
 const postSchema = Joi.object({
+  author: Joi.string().required().min(4).max(30),
   title: Joi.string().required().min(1).max(100),
   excerpt: Joi.string().required().min(1).max(200).optional(),
   content: Joi.string().required().min(1),
@@ -487,6 +488,7 @@ app.get("/api/admin/posts/:postId", async (req, res) => {
       views: postData.views || 0,
       published_date: formattedDate, 
       title: postData.title,
+      author: postData.author,
       content: postData.content,
       excerpt: postData.excerpt,
       thumbnail: postData.thumbnail,
