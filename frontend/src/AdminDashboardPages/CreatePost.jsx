@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
-import { Image, Tag, AlertTriangle } from 'lucide-react'
+import { Image, Tag, AlertTriangle, Loader2 } from 'lucide-react'
 import RichTextEditor from '../components/RichTextEditor'
 import axios from 'axios'
 import { z } from 'zod'
@@ -29,6 +29,7 @@ const CreatePost = () => {
   const [errors, setErrors] = useState({})
   const [categories, setCategories] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -72,7 +73,10 @@ const CreatePost = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (isSubmitting) return
+
     const trimmedTitle = title.trim()
+    const trimmedAuthor = author.trim()
     const trimmedExcerpt = excerpt.trim()
     const trimmedCategory = category.trim()
     const isContentEmpty = !content || content.replace(/<[^>]*>/g, '').trim() === ''
@@ -83,7 +87,10 @@ const CreatePost = () => {
       return
     }
 
+    setIsSubmitting(true)
+
     const validation = postSchema.safeParse({
+      author: trimmedAuthor,
       title: trimmedTitle,
       content: isContentEmpty ? '' : content,
       excerpt: trimmedExcerpt,
@@ -98,6 +105,7 @@ const CreatePost = () => {
       })
       setErrors(fieldErrors)
       toast.error('Please fix the errors below')
+      setIsSubmitting(false)
       return
     }
 
@@ -108,11 +116,11 @@ const CreatePost = () => {
 
     try {
       const formData = new FormData()
-      formData.append('title', title)
-      formData.append('author', author)
-      formData.append('excerpt', excerpt)
+      formData.append('title', trimmedTitle)
+      formData.append('author', trimmedAuthor)
+      formData.append('excerpt', trimmedExcerpt)
       formData.append('content', content)
-      formData.append('category', category)
+      formData.append('category', trimmedCategory)
       formData.append('status', status)
       formData.append('published_date', new Date().toISOString())
       formData.append('thumbnail', thumbnail)
@@ -144,6 +152,8 @@ const CreatePost = () => {
                     'Failed to create post'
         toast.error(msg)
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -348,6 +358,7 @@ const CreatePost = () => {
                     handleThumbnailChange(e)
                     clearError('thumbnail')
                   }}
+                  disabled={isSubmitting}
                 />
               </div>
               
@@ -401,10 +412,17 @@ const CreatePost = () => {
           </button>
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#e94235] hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235]"
-            disabled={categories.length === 0}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#e94235] hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235] flex items-center justify-center"
+            disabled={categories.length === 0 || isSubmitting}
           >
-            {status === 'published' ? 'Publish Post' : 'Save Draft'}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                {status === 'published' ? 'Publishing...' : 'Saving...'}
+              </>
+            ) : (
+              <>{status === 'published' ? 'Publish Post' : 'Save Draft'}</>
+            )}
           </button>
         </div>
       </form>
