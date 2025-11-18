@@ -11,6 +11,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@tiptap/extension-link": "^3.10.7",
+    "@tiptap/react": "^3.10.7",
+    "@tiptap/starter-kit": "^3.10.7",
     "compression": "^1.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
