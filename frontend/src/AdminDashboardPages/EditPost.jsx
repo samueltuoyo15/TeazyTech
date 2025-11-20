@@ -23,7 +23,6 @@ const EditPost = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Upload function for editor images
   const uploadImage = async (file) => {
     try {
       const formData = new FormData();
@@ -39,14 +38,12 @@ const EditPost = () => {
     }
   };
 
-  // Fetch Categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get("/api/admin/categories", {
           withCredentials: true,
         });
-        // Assuming c.name is the correct property for category names
         setCategories(res.data.map((c) => c.name));
       } catch {
         toast.error("Failed to load categories");
@@ -57,7 +54,6 @@ const EditPost = () => {
     fetchCategories();
   }, []);
 
-  // Fetch Post
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -80,7 +76,7 @@ const EditPost = () => {
       }
     };
     fetchPost();
-  }, [id]); // *** FIX: Removed 'editor' from dependencies ***
+  }, [id]);
 
   const handleThumbnailChange = (e) => {
     const file = e.target.files?.[0];
@@ -103,12 +99,10 @@ const EditPost = () => {
     const newErrors = {};
     if (!title.trim()) newErrors.title = "Title is required";
     if (!author.trim()) newErrors.author = "Author is required";
-    // Check if content is empty or contains only HTML tags (like <p></p>)
     if (!content || content.replace(/<[^>]+>/g, "").trim() === "")
       newErrors.content = "Content is required";
     if (!category) newErrors.category = "Category is required";
-    if (!thumbnail && !thumbnailPreview)
-      newErrors.thumbnail = "Thumbnail is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -127,30 +121,34 @@ const EditPost = () => {
       formData.append("content", content);
       formData.append("category", category);
       formData.append("status", status);
-      // Only set published_date if status is 'published'
+
       if (status === "published") {
         formData.append("published_date", new Date().toISOString());
       }
-
-      // If thumbnail is a new File object, append it. Otherwise, assume it's the existing URL (string) and append that.
       if (thumbnail instanceof File) {
         formData.append("thumbnail", thumbnail);
-      } else if (typeof thumbnail === "string" && thumbnail) {
-        // If it's a string (existing URL), you might need a different key
-        // or have your backend check if the 'thumbnail' field is a string vs file.
-        // For simplicity, we'll append the string here, assuming the backend handles it.
-        // If your backend only expects a file for 'thumbnail', you should skip this 'else if' block.
-        formData.append("existingThumbnailUrl", thumbnail);
+      } else if (thumbnailPreview) {
+        formData.append("thumbnail", thumbnailPreview);
       }
 
-      await axios.put(`/api/admin/posts/${id}`, formData, {
+      await axios.patch(`/api/admin/posts/${id}`, formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Post updated successfully");
       navigate("/posts");
-    } catch {
-      console.error("Failed to update post");
+    } catch (error) {
+      console.error("Failed to update post:", error);
+      if (error.response?.data?.errors) {
+        const serverErrors = {};
+        error.response.data.errors.forEach((err) => {
+          serverErrors[err.field] = err.message;
+        });
+        setErrors(serverErrors);
+        toast.error("Please fix the validation errors");
+      } else {
+        toast.error("Failed to update post");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -169,7 +167,6 @@ const EditPost = () => {
     <Layout title="Edit Post">
       <Toaster richColors position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Post Details */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <div className="px-6 py-4 bg-[#e94235] text-white">
             <h3 className="text-lg font-medium">Edit Post</h3>
@@ -249,7 +246,6 @@ const EditPost = () => {
           </div>
         </div>
 
-        {/* Post Settings */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="px-6 py-4 bg-[#e94235] text-white">
@@ -328,7 +324,6 @@ const EditPost = () => {
             </div>
           </div>
 
-          {/* Thumbnail */}
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Featured Image</h3>
