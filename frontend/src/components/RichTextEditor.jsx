@@ -6,8 +6,12 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
-import Color from "@tiptap/extension-color";
 import Blockquote from "@tiptap/extension-blockquote";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Highlight from "@tiptap/extension-highlight";
+import { Color } from "@tiptap/extension-color";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { FontFamily } from "@tiptap/extension-font-family";
 
 import { createLowlight, common } from "lowlight";
 
@@ -22,6 +26,16 @@ import {
   Link as LinkIcon,
   Image as ImgIcon,
   Quote,
+  Heading1,
+  Heading2,
+  Heading3,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Highlighter,
+  Undo,
+  Redo,
 } from "lucide-react";
 
 // Create lowlight instance with common languages
@@ -30,13 +44,24 @@ const lowlight = createLowlight(common);
 const RichTextEditor = ({ value, onChange, uploadImage }) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        // we configure codeBlock inside the lowlight extension instead
+        codeBlock: false,
+      }),
       Underline,
+      TextStyle,
       Color,
+      FontFamily,
+      Highlight.configure({ multicolor: true }),
       Image,
-      Link,
+      Link.configure({
+        openOnClick: false,
+      }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Blockquote,
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
       Placeholder.configure({
         placeholder: "Write your post content here...",
       }),
@@ -44,7 +69,11 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
     content: value || "",
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
-      attributes: { class: "prose max-w-full focus:outline-none p-2" },
+      attributes: {
+        // Added min-h to ensure the text area is always visible and clickable
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl max-w-full focus:outline-none p-4 min-h-[150px]",
+      },
     },
   });
 
@@ -58,10 +87,10 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
 
   const insertImageFile = async (e) => {
     const file = e.target.files[0];
-    if (!file) return; // exit early if no file selected
+    if (!file) return;
 
     if (typeof uploadImage !== "function") {
-      console.warn("No uploadImage function provided"); // just warn, don’t block
+      console.warn("No uploadImage function provided");
       return;
     }
 
@@ -71,104 +100,235 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
     } catch (err) {
       console.error("Image upload failed:", err);
     } finally {
-      e.target.value = ""; // reset input
+      e.target.value = "";
     }
   };
 
   const setLink = () => {
-    const url = prompt("Enter URL");
-    if (url)
-      editor
-        .chain()
-        .focus()
-        .extendMarkRange("link")
-        .setLink({ href: url })
-        .run();
+    const previousUrl = editor.getAttributes("link").href;
+    const url = prompt("Enter URL", previousUrl);
+
+    if (url === null) return; // cancelled
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      return;
+    }
+
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
+  // Reusable button class for consistency
+  const btnClass = (isActive) =>
+    `p-1.5 rounded hover:bg-gray-200 transition-colors ${
+      isActive ? "bg-gray-300 text-black" : "text-gray-600"
+    }`;
+
   return (
-    <div className="relative">
-      <div className="mb-2 flex flex-wrap gap-2 bg-gray-100 p-2 rounded-md">
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          title="Bold"
-          className={
-            editor.isActive("bold") ? "bg-gray-300 p-1 rounded" : "p-1 rounded"
-          }
-        >
-          <Bold className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          title="Italic"
-          className={
-            editor.isActive("italic")
-              ? "bg-gray-300 p-1 rounded"
-              : "p-1 rounded"
-          }
-        >
-          <Italic className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          title="Underline"
-          className={
-            editor.isActive("underline")
-              ? "bg-gray-300 p-1 rounded"
-              : "p-1 rounded"
-          }
-        >
-          <UnderlineIcon className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          title="Strikethrough"
-          className={
-            editor.isActive("strike")
-              ? "bg-gray-300 p-1 rounded"
-              : "p-1 rounded"
-          }
-        >
-          <Strikethrough className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          title="Code"
-          className={
-            editor.isActive("code") ? "bg-gray-300 p-1 rounded" : "p-1 rounded"
-          }
-        >
-          <Code className="h-4 w-4" />
-        </button>
-        <button onClick={setLink} title="Insert Link" className="p-1 rounded">
-          <LinkIcon className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          title="Blockquote"
-          className={
-            editor.isActive("blockquote")
-              ? "bg-gray-300 p-1 rounded"
-              : "p-1 rounded"
-          }
-        >
-          <Quote className="h-4 w-4" />
-        </button>
-        <label className="p-1 rounded cursor-pointer" title="Upload Image">
-          <ImgIcon className="h-4 w-4" />
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={insertImageFile}
-          />
-        </label>
+    <div className="relative border rounded-md bg-white shadow-sm">
+      {/* Toolbar Container */}
+      <div className="flex flex-wrap gap-1 bg-gray-50 p-2 border-b rounded-t-md sticky top-0 z-10">
+        {/* --- HISTORY --- */}
+        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+          <button
+            onClick={() => editor.chain().focus().undo().run()}
+            disabled={!editor.can().undo()}
+            className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30"
+            title="Undo"
+          >
+            <Undo className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().redo().run()}
+            disabled={!editor.can().redo()}
+            className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30"
+            title="Redo"
+          >
+            <Redo className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* --- HEADINGS --- */}
+        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+          <button
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run()
+            }
+            className={btnClass(editor.isActive("heading", { level: 1 }))}
+            title="Heading 1"
+          >
+            <Heading1 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+            className={btnClass(editor.isActive("heading", { level: 2 }))}
+            title="Heading 2"
+          >
+            <Heading2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 3 }).run()
+            }
+            className={btnClass(editor.isActive("heading", { level: 3 }))}
+            title="Heading 3"
+          >
+            <Heading3 className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* --- FONTS --- */}
+        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+          <button
+            onClick={() => editor.chain().focus().setFontFamily("Inter").run()}
+            className={btnClass(
+              editor.isActive("textStyle", { fontFamily: "Inter" }),
+            )}
+            title="Sans Serif"
+          >
+            <span className="text-xs font-sans font-bold">Sans</span>
+          </button>
+          <button
+            onClick={() => editor.chain().focus().setFontFamily("serif").run()}
+            className={btnClass(
+              editor.isActive("textStyle", { fontFamily: "serif" }),
+            )}
+            title="Serif"
+          >
+            <span className="text-xs font-serif font-bold">Serif</span>
+          </button>
+          <button
+            onClick={() =>
+              editor.chain().focus().setFontFamily("monospace").run()
+            }
+            className={btnClass(
+              editor.isActive("textStyle", { fontFamily: "monospace" }),
+            )}
+            title="Monospace"
+          >
+            <span className="text-xs font-mono font-bold">Mono</span>
+          </button>
+        </div>
+
+        {/* --- BASIC FORMATTING --- */}
+        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+          <button
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={btnClass(editor.isActive("bold"))}
+            title="Bold"
+          >
+            <Bold className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={btnClass(editor.isActive("italic"))}
+            title="Italic"
+          >
+            <Italic className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            className={btnClass(editor.isActive("underline"))}
+            title="Underline"
+          >
+            <UnderlineIcon className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            className={btnClass(editor.isActive("strike"))}
+            title="Strikethrough"
+          >
+            <Strikethrough className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleHighlight().run()}
+            className={btnClass(editor.isActive("highlight"))}
+            title="Highlight"
+          >
+            <Highlighter className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* --- ALIGNMENT --- */}
+        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+          <button
+            onClick={() => editor.chain().focus().setTextAlign("left").run()}
+            className={btnClass(editor.isActive({ textAlign: "left" }))}
+            title="Align Left"
+          >
+            <AlignLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().setTextAlign("center").run()}
+            className={btnClass(editor.isActive({ textAlign: "center" }))}
+            title="Align Center"
+          >
+            <AlignCenter className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().setTextAlign("right").run()}
+            className={btnClass(editor.isActive({ textAlign: "right" }))}
+            title="Align Right"
+          >
+            <AlignRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* --- LISTS & BLOCKS --- */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            className={btnClass(editor.isActive("bulletList"))}
+            title="Bullet List"
+          >
+            <List className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            className={btnClass(editor.isActive("orderedList"))}
+            title="Ordered List"
+          >
+            <ListOrdered className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            className={btnClass(editor.isActive("codeBlock"))}
+            title="Code Block"
+          >
+            <Code className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            className={btnClass(editor.isActive("blockquote"))}
+            title="Blockquote"
+          >
+            <Quote className="h-4 w-4" />
+          </button>
+          <button
+            onClick={setLink}
+            className={btnClass(editor.isActive("link"))}
+            title="Link"
+          >
+            <LinkIcon className="h-4 w-4" />
+          </button>
+          <label
+            className="p-1.5 rounded hover:bg-gray-200 cursor-pointer text-gray-600"
+            title="Upload Image"
+          >
+            <ImgIcon className="h-4 w-4" />
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={insertImageFile}
+            />
+          </label>
+        </div>
       </div>
 
-      <EditorContent
-        editor={editor}
-        className="border rounded-md min-h-[16rem] p-2"
-      />
+      {/* Editor Area */}
+      <EditorContent editor={editor} />
     </div>
   );
 };
