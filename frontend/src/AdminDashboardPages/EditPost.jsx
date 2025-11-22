@@ -174,7 +174,7 @@ const EditPost = () => {
           <div className="p-6 space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title *
+                Title
               </label>
               <input
                 type="text"
@@ -195,7 +195,7 @@ const EditPost = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Author *
+                Author
               </label>
               <input
                 type="text"
@@ -228,7 +228,7 @@ const EditPost = () => {
             <div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Content *
+                  Content
                 </label>
                 <RichTextEditor
                   value={content}
@@ -254,7 +254,7 @@ const EditPost = () => {
             <div className="p-6 space-y-4">
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Tag className="h-4 w-4 mr-1" /> Category *
+                  <Tag className="h-4 w-4 mr-1" /> Category
                 </label>
                 {loadingCategories ? (
                   <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
