@@ -32,20 +32,17 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  AlignJustify,
   Highlighter,
   Undo,
   Redo,
 } from "lucide-react";
 
-// Create lowlight instance with common languages
 const lowlight = createLowlight(common);
 
 const RichTextEditor = ({ value, onChange, uploadImage }) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // we configure codeBlock inside the lowlight extension instead
         codeBlock: false,
       }),
       Underline,
@@ -70,7 +67,6 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: {
-        // Added min-h to ensure the text area is always visible and clickable
         class:
           "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl max-w-full focus:outline-none p-4 min-h-[150px]",
       },
@@ -108,7 +104,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
     const previousUrl = editor.getAttributes("link").href;
     const url = prompt("Enter URL", previousUrl);
 
-    if (url === null) return; // cancelled
+    if (url === null) return;
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
@@ -117,7 +113,6 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
-  // Reusable button class for consistency
   const btnClass = (isActive) =>
     `p-1.5 rounded hover:bg-gray-200 transition-colors ${
       isActive ? "bg-gray-300 text-black" : "text-gray-600"
@@ -125,11 +120,10 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
 
   return (
     <div className="relative border rounded-md bg-white shadow-sm">
-      {/* Toolbar Container */}
       <div className="flex flex-wrap gap-1 bg-gray-50 p-2 border-b rounded-t-md sticky top-0 z-10">
-        {/* --- HISTORY --- */}
         <div className="flex items-center gap-1 border-r pr-2 mr-1">
           <button
+            type="button"
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
             className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30"
@@ -138,6 +132,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Undo className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
             className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30"
@@ -147,9 +142,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        {/* --- HEADINGS --- */}
         <div className="flex items-center gap-1 border-r pr-2 mr-1">
           <button
+            type="button"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 1 }).run()
             }
@@ -159,6 +154,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Heading1 className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 2 }).run()
             }
@@ -168,6 +164,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Heading2 className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 3 }).run()
             }
@@ -178,9 +175,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        {/* --- FONTS --- */}
         <div className="flex items-center gap-1 border-r pr-2 mr-1">
           <button
+            type="button"
             onClick={() => editor.chain().focus().setFontFamily("Inter").run()}
             className={btnClass(
               editor.isActive("textStyle", { fontFamily: "Inter" }),
@@ -190,6 +187,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <span className="text-xs font-sans font-bold">Sans</span>
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().setFontFamily("serif").run()}
             className={btnClass(
               editor.isActive("textStyle", { fontFamily: "serif" }),
@@ -199,6 +197,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <span className="text-xs font-serif font-bold">Serif</span>
           </button>
           <button
+            type="button"
             onClick={() =>
               editor.chain().focus().setFontFamily("monospace").run()
             }
@@ -211,9 +210,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        {/* --- BASIC FORMATTING --- */}
         <div className="flex items-center gap-1 border-r pr-2 mr-1">
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={btnClass(editor.isActive("bold"))}
             title="Bold"
@@ -221,6 +220,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Bold className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={btnClass(editor.isActive("italic"))}
             title="Italic"
@@ -228,6 +228,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Italic className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             className={btnClass(editor.isActive("underline"))}
             title="Underline"
@@ -235,6 +236,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <UnderlineIcon className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleStrike().run()}
             className={btnClass(editor.isActive("strike"))}
             title="Strikethrough"
@@ -242,6 +244,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Strikethrough className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleHighlight().run()}
             className={btnClass(editor.isActive("highlight"))}
             title="Highlight"
@@ -250,9 +253,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        {/* --- ALIGNMENT --- */}
         <div className="flex items-center gap-1 border-r pr-2 mr-1">
           <button
+            type="button"
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
             className={btnClass(editor.isActive({ textAlign: "left" }))}
             title="Align Left"
@@ -260,6 +263,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <AlignLeft className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
             className={btnClass(editor.isActive({ textAlign: "center" }))}
             title="Align Center"
@@ -267,6 +271,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <AlignCenter className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
             className={btnClass(editor.isActive({ textAlign: "right" }))}
             title="Align Right"
@@ -275,9 +280,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        {/* --- LISTS & BLOCKS --- */}
         <div className="flex items-center gap-1">
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             className={btnClass(editor.isActive("bulletList"))}
             title="Bullet List"
@@ -285,6 +290,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <List className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             className={btnClass(editor.isActive("orderedList"))}
             title="Ordered List"
@@ -292,6 +298,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <ListOrdered className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
             className={btnClass(editor.isActive("codeBlock"))}
             title="Code Block"
@@ -299,6 +306,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Code className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             className={btnClass(editor.isActive("blockquote"))}
             title="Blockquote"
@@ -306,6 +314,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <Quote className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={setLink}
             className={btnClass(editor.isActive("link"))}
             title="Link"
@@ -327,7 +336,6 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
         </div>
       </div>
 
-      {/* Editor Area */}
       <EditorContent editor={editor} />
     </div>
   );

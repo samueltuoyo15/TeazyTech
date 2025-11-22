@@ -166,7 +166,7 @@ const CreatePost = () => {
           <div className="p-6 space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title *
+                Title
               </label>
               <input
                 type="text"
@@ -180,7 +180,7 @@ const CreatePost = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Author *
+                Author
               </label>
               <input
                 type="text"
@@ -194,7 +194,7 @@ const CreatePost = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Excerpt *
+                Excerpt
               </label>
               <textarea
                 value={excerpt}
@@ -207,7 +207,7 @@ const CreatePost = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Content *
+                Content
               </label>
               <RichTextEditor
                 value={content}
@@ -227,7 +227,7 @@ const CreatePost = () => {
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <Tag className="h-4 w-4 mr-1" />
-                  Category *
+                  Category
                 </label>
                 {loadingCategories ? (
                   <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
@@ -300,7 +300,7 @@ const CreatePost = () => {
             Cancel
           </button>
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Post"}
+            {isSubmitting ? "Publishing..." : "Publish Post"}
           </button>
         </div>
       </form>
