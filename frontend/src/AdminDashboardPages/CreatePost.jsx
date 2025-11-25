@@ -139,6 +139,10 @@ const CreatePost = () => {
       formData.append("published_date", new Date().toISOString());
       formData.append("thumbnail", thumbnail);
 
+      if (status === "published") {
+        formData.append("published_date", new Date().toISOString());
+      }
+
       const response = await axios.post("/api/admin/create-post", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
