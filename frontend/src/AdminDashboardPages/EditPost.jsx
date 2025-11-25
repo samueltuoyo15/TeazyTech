@@ -121,6 +121,7 @@ const EditPost = () => {
       formData.append("content", content);
       formData.append("category", category);
       formData.append("status", status);
+      formData.append("published_date", new Date().toISOString());
       formData.append("thumbnail", thumbnail);
       if (status === "published") {
         formData.append("published_date", new Date().toISOString());
