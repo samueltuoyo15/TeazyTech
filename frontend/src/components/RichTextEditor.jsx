@@ -20,18 +20,17 @@ import {
   Italic,
   Underline as UnderlineIcon,
   Strikethrough,
-  Code,
   List,
   ListOrdered,
   Link as LinkIcon,
   Image as ImgIcon,
-  Quote,
   Heading1,
   Heading2,
   Heading3,
   AlignLeft,
   AlignCenter,
   AlignRight,
+  AlignJustify,
   Highlighter,
   Undo,
   Redo,
@@ -278,6 +277,14 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           >
             <AlignRight className="h-4 w-4" />
           </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+            className={btnClass(editor.isActive({ textAlign: "justify" }))}
+            title="Align Justify"
+          >
+            <AlignJustify className="h-4 w-4" />
+          </button>
         </div>
 
         <div className="flex items-center gap-1">
@@ -296,22 +303,6 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             title="Ordered List"
           >
             <ListOrdered className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className={btnClass(editor.isActive("codeBlock"))}
-            title="Code Block"
-          >
-            <Code className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={btnClass(editor.isActive("blockquote"))}
-            title="Blockquote"
-          >
-            <Quote className="h-4 w-4" />
           </button>
           <button
             type="button"

@@ -26,7 +26,7 @@ const CreatePost = () => {
   const [category, setCategory] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
-  const [status, setStatus] = useState("draft");
+  const [status, setStatus] = useState("published");
   const [errors, setErrors] = useState({});
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -136,7 +136,6 @@ const CreatePost = () => {
       formData.append("content", content);
       formData.append("category", trimmedCategory);
       formData.append("status", status);
-      formData.append("published_date", new Date().toISOString());
       formData.append("thumbnail", thumbnail);
 
       if (status === "published") {

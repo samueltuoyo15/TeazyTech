@@ -46,9 +46,9 @@ const postSchema = Joi.object({
   excerpt: Joi.string().required().min(1).max(200).optional(),
   content: Joi.string().required().min(1),
   category: Joi.string().min(2).max(30).required(),
-  published_date: Joi.date().iso(),
+  published_date: Joi.date().iso().optional(),
   status: Joi.string().valid("draft", "published").required(),
-  thumbnail: Joi.string().uri().optional(),
+  thumbnail: Joi.alternatives().try(Joi.string().uri(), Joi.any()).optional(),
   views: Joi.number().default(0),
   viewedIPs: Joi.array().items(Joi.string()).default([]),
 });
@@ -386,6 +386,7 @@ app.post(
   upload.single("thumbnail"),
   async (req, res, next) => {
     logger.info("Received create post request");
+    console.log(req.body);
     const token = req.cookies.accessToken;
     logger.debug("Extracted access token", { hasToken: !!token });
 
