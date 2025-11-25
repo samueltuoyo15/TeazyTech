@@ -121,14 +121,9 @@ const EditPost = () => {
       formData.append("content", content);
       formData.append("category", category);
       formData.append("status", status);
-
+      formData.append("thumbnail", thumbnail);
       if (status === "published") {
         formData.append("published_date", new Date().toISOString());
-      }
-      if (thumbnail instanceof File) {
-        formData.append("thumbnail", thumbnail);
-      } else if (thumbnailPreview) {
-        formData.append("thumbnail", thumbnailPreview);
       }
 
       await axios.patch(`/api/admin/posts/${id}`, formData, {
