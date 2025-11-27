@@ -539,7 +539,7 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
   });
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 5;
     const offset = (page - 1) * limit;
     logger.debug("Pagination parameters", { page, limit, offset });
 
@@ -748,10 +748,23 @@ app.patch(
       if (req.body.category !== undefined)
         updateFields.category = req.body.category;
       if (req.body.status !== undefined) updateFields.status = req.body.status;
-      if (req.body.published_date !== undefined)
-        updateFields.published_date = req.body.published_date;
 
-      // Handle thumbnail - either from file upload or existing URL
+      if (
+        req.body.published_date !== undefined &&
+        req.body.published_date !== ""
+      ) {
+        try {
+          updateFields.published_date = new Date(
+            req.body.published_date,
+          ).toISOString();
+        } catch (e) {
+          logger.warn("Invalid published_date format", {
+            date: req.body.published_date,
+          });
+          updateFields.published_date = new Date().toISOString();
+        }
+      }
+
       if (req.file) {
         updateFields.thumbnail = req.file.path;
         logger.debug("New thumbnail uploaded", {
@@ -761,17 +774,34 @@ app.patch(
         updateFields.thumbnail = req.body.thumbnail;
       }
 
+      const flexibleUpdateSchema = Joi.object({
+        author: Joi.string().min(4).max(30).optional(),
+        title: Joi.string().min(1).max(100).optional(),
+        excerpt: Joi.string().max(200).allow("").optional(),
+        content: Joi.string().min(1).optional(),
+        category: Joi.string().min(2).max(30).optional(),
+        published_date: Joi.string().isoDate().optional(),
+        status: Joi.string().valid("draft", "published").optional(),
+        thumbnail: Joi.alternatives()
+          .try(Joi.string().uri(), Joi.any())
+          .optional(),
+      }).min(1);
+
       logger.debug("Validating update data against schema", {
         fields: Object.keys(updateFields),
+        values: updateFields,
       });
-      const { error, value } = postUpdateSchema.validate(updateFields, {
+
+      const { error, value } = flexibleUpdateSchema.validate(updateFields, {
         abortEarly: false,
         allowUnknown: false,
+        stripUnknown: true,
       });
 
       if (error) {
         logger.warn("Post update validation failed", {
           details: error.details,
+          updateFields: updateFields,
         });
         const errors = error.details.map((detail) => ({
           field: detail.path[0],
@@ -795,6 +825,20 @@ app.patch(
         ...value,
         updated_at: admin.firestore.FieldValue.serverTimestamp(),
       };
+
+      if (updateData.published_date) {
+        try {
+          updateData.published_date = admin.firestore.Timestamp.fromDate(
+            new Date(updateData.published_date),
+          );
+        } catch (e) {
+          logger.warn("Failed to convert published_date to timestamp", {
+            error: e.message,
+          });
+          updateData.published_date =
+            admin.firestore.FieldValue.serverTimestamp();
+        }
+      }
 
       logger.trace("Update data prepared", { fields: Object.keys(updateData) });
       logger.debug("Applying update to Firestore");

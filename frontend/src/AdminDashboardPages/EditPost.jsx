@@ -121,11 +121,26 @@ const EditPost = () => {
       formData.append("content", content);
       formData.append("category", category);
       formData.append("status", status);
-      formData.append("published_date", new Date().toISOString());
-      formData.append("thumbnail", thumbnail);
+
+      if (thumbnail instanceof File) {
+        formData.append("thumbnail", thumbnail);
+      } else if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
+
       if (status === "published") {
         formData.append("published_date", new Date().toISOString());
       }
+
+      console.log("Sending update data:", {
+        title: title.trim(),
+        author: author.trim(),
+        excerpt: excerpt.trim(),
+        content: content ? "content exists" : "no content",
+        category,
+        status,
+        hasThumbnail: !!thumbnail,
+      });
 
       await axios.patch(`/api/admin/posts/${id}`, formData, {
         withCredentials: true,
