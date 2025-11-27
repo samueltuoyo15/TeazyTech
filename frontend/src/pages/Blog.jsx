@@ -1,89 +1,97 @@
-import { Link, useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
-import axios from "axios"
-import "../styles/Blog.css"
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "../styles/Blog.css";
 
 const Blog = () => {
-  const [blogPosts, setBlogPosts] = useState([])
-  const [categories, setCategories] = useState(["All Categories"])
-  const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState("All Categories")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [totalPosts, setTotalPosts] = useState(0)
-  const postsPerPage = 10
-  const navigate = useNavigate()
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [categories, setCategories] = useState(["All Categories"]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const postsPerPage = 5;
+  const navigate = useNavigate();
 
   const fetchPosts = async (page = 1) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axios.get(`/api/admin/posts/pagination`, {
         params: { page, limit: postsPerPage },
-        withCredentials: true
-      })
-      const { posts, pagination } = response.data
-      const publishedPosts = posts.filter(post => post.status === "published")
-      
-      setBlogPosts(publishedPosts)
-      setCurrentPage(pagination.currentPage)
-      setTotalPages(pagination.totalPages)
-      setTotalPosts(pagination.total)
-      
+        withCredentials: true,
+      });
+      const { posts, pagination } = response.data;
+      const publishedPosts = posts.filter(
+        (post) => post.status === "published",
+      );
+
+      setBlogPosts(publishedPosts);
+      setCurrentPage(pagination.currentPage);
+      setTotalPages(pagination.totalPages);
+      setTotalPosts(pagination.total);
+
       if (page === 1) {
-        const uniqueCategories = ["All Categories", ...new Set(publishedPosts.map(post => post.category))]
-        setCategories(uniqueCategories)
+        const uniqueCategories = [
+          "All Categories",
+          ...new Set(publishedPosts.map((post) => post.category)),
+        ];
+        setCategories(uniqueCategories);
       }
     } catch (err) {
-      console.error("Error fetching data:", err)
+      console.error("Error fetching data:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchPosts(currentPage)
-  }, [currentPage])
+    fetchPosts(currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
-    window.scroll({ top: 0, left: 0, behavior: "smooth" })
-  }, [currentPage])
+    window.scroll({ top: 0, left: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   const trackPostView = async (postId, e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await axios.post(`/api/posts/${postId}/view`)
-      navigate(`/blog/${postId}`)
+      await axios.post(`/api/posts/${postId}/view`);
+      navigate(`/blog/${postId}`);
     } catch (error) {
-      console.error("Error tracking view:", error)
-      navigate(`/blog/${postId}`)
+      console.error("Error tracking view:", error);
+      navigate(`/blog/${postId}`);
     }
-  }
+  };
 
   const handleCategoryChange = (category) => {
-    setSelectedCategory(category)
-    setCurrentPage(1)
-  }
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  };
 
   const handleSearch = (e) => {
-    e.preventDefault()
-    setCurrentPage(1)
-  }
+    e.preventDefault();
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
+      setCurrentPage(page);
     }
-  }
+  };
 
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesCategory = selectedCategory === "All Categories" || post.category === selectedCategory
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  const filteredPosts = blogPosts.filter((post) => {
+    const matchesCategory =
+      selectedCategory === "All Categories" ||
+      post.category === selectedCategory;
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  const recentPosts = blogPosts.slice(0, 3)
+  const recentPosts = blogPosts.slice(0, 3);
 
   if (loading) {
     return (
@@ -96,7 +104,7 @@ const Blog = () => {
           </div>
         </section>
       </div>
-    )
+    );
   }
 
   return (
@@ -124,13 +132,17 @@ const Blog = () => {
                     <div className="blog-post-content">
                       <div className="blog-post-meta">
                         <span>Author: {post.author}</span>
-                        <span className="blog-post-date">{post.published_date}</span>
-                        <span className="blog-post-views">{post.views || 0} views</span>
+                        <span className="blog-post-date">
+                          {post.published_date}
+                        </span>
+                        <span className="blog-post-views">
+                          {post.views || 0} views
+                        </span>
                       </div>
                       <h2>{post.title}</h2>
                       <p>{post.excerpt}</p>
-                      <Link 
-                        to={`/blog/${post.id}`} 
+                      <Link
+                        to={`/blog/${post.id}`}
                         className="blog-post-link"
                         onClick={(e) => trackPostView(post.id, e)}
                       >
@@ -148,46 +160,53 @@ const Blog = () => {
 
               {totalPosts > postsPerPage && (
                 <div className="blog-pagination">
-                  <button 
+                  <button
                     className="pagination-btn pagination-prev"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
                     <i className="fas fa-arrow-left"></i> Prev
                   </button>
-                  
+
                   {[...Array(totalPages)].map((_, i) => {
-                    const page = i + 1
+                    const page = i + 1;
                     if (totalPages <= 5) {
                       return (
                         <button
                           key={page}
-                          className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                          className={`pagination-btn ${currentPage === page ? "active" : ""}`}
                           onClick={() => handlePageChange(page)}
                         >
                           {page}
                         </button>
-                      )
+                      );
                     }
-                    if (page === 1 || page === totalPages || 
-                        (page >= currentPage - 1 && page <= currentPage + 1)) {
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
                       return (
                         <button
                           key={page}
-                          className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                          className={`pagination-btn ${currentPage === page ? "active" : ""}`}
                           onClick={() => handlePageChange(page)}
                         >
                           {page}
                         </button>
-                      )
+                      );
                     }
                     if (page === currentPage - 2 || page === currentPage + 2) {
-                      return <span key={page} className="pagination-ellipsis">...</span>
+                      return (
+                        <span key={page} className="pagination-ellipsis">
+                          ...
+                        </span>
+                      );
                     }
-                    return null
+                    return null;
                   })}
-                  
-                  <button 
+
+                  <button
                     className="pagination-btn pagination-next"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -202,9 +221,9 @@ const Blog = () => {
               <div className="sidebar-widget search-widget">
                 <h3>Search</h3>
                 <form className="search-form" onSubmit={handleSearch}>
-                  <input 
-                    type="text" 
-                    placeholder="Search blog posts..." 
+                  <input
+                    type="text"
+                    placeholder="Search blog posts..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -219,12 +238,14 @@ const Blog = () => {
                 <ul className="category-list">
                   {categories.map((category, index) => (
                     <li key={index}>
-                      <a 
-                        href="#" 
-                        className={category === selectedCategory ? "active" : ""}
+                      <a
+                        href="#"
+                        className={
+                          category === selectedCategory ? "active" : ""
+                        }
                         onClick={(e) => {
-                          e.preventDefault()
-                          handleCategoryChange(category)
+                          e.preventDefault();
+                          handleCategoryChange(category);
                         }}
                       >
                         {category}
@@ -245,11 +266,16 @@ const Blog = () => {
                         </div>
                         <div className="recent-post-content">
                           <h4>
-                            <Link to={`/blog/${post.id}`} onClick={(e) => trackPostView(post.id, e)}>
+                            <Link
+                              to={`/blog/${post.id}`}
+                              onClick={(e) => trackPostView(post.id, e)}
+                            >
                               {post.title}
                             </Link>
                           </h4>
-                          <div className="recent-post-date">{post.published_date}</div>
+                          <div className="recent-post-date">
+                            {post.published_date}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -259,9 +285,16 @@ const Blog = () => {
 
               <div className="sidebar-widget subscribe-widget">
                 <h3>Subscribe</h3>
-                <p>Get the latest educational technology updates directly to your inbox.</p>
+                <p>
+                  Get the latest educational technology updates directly to your
+                  inbox.
+                </p>
                 <form className="subscribe-form">
-                  <input type="email" placeholder="Your email address" required />
+                  <input
+                    type="email"
+                    placeholder="Your email address"
+                    required
+                  />
                   <button type="submit" className="btn btn-primary">
                     Subscribe
                   </button>
@@ -277,8 +310,8 @@ const Blog = () => {
           <div className="blog-cta-content text-center">
             <h2>Want to Contribute?</h2>
             <p>
-              Share your educational technology expertise with our community. We welcome guest posts from educators and
-              technology specialists.
+              Share your educational technology expertise with our community. We
+              welcome guest posts from educators and technology specialists.
             </p>
             <a href="/contact" className="btn btn-accent">
               Submit a Guest Post
@@ -287,7 +320,7 @@ const Blog = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default Blog
+export default Blog;
