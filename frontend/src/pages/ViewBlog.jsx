@@ -91,7 +91,8 @@ const ViewBlog = () => {
             alt={post.title}
             className="featured-image"
             onError={(e) => {
-              e.target.src = "/placeholder-image.jpg";
+              e.target.onerror = null;
+              e.target.src = "/default-blog-thumbnail.png";
               e.target.classList.add("error-image");
             }}
           />

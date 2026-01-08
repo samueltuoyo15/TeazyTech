@@ -347,8 +347,12 @@ const EditPost = () => {
               />
               {thumbnailPreview && (
                 <img
-                  src={thumbnailPreview}
+                  src={thumbnailPreview || "/default-blog-thumbnail.png"}
                   className="w-full h-48 object-cover rounded-md"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/default-blog-thumbnail.png";
+                  }}
                 />
               )}
               {errors.thumbnail && (
