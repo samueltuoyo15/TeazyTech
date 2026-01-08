@@ -96,10 +96,11 @@ const CreatePost = () => {
     const isContentEmpty =
       !content || content.replace(/<[^>]*>/g, "").trim() === "";
 
-    if (!thumbnail) {
-      setErrors((prev) => ({ ...prev, thumbnail: "Thumbnail is required" }));
-      return;
-    }
+    // Thumbnail is optional now
+    // if (!thumbnail) {
+    //   setErrors((prev) => ({ ...prev, thumbnail: "Thumbnail is required" }));
+    //   return;
+    // }
 
     setIsSubmitting(true);
 
@@ -136,7 +137,9 @@ const CreatePost = () => {
       formData.append("content", content);
       formData.append("category", trimmedCategory);
       formData.append("status", status);
-      formData.append("thumbnail", thumbnail);
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
 
       if (status === "published") {
         formData.append("published_date", new Date().toISOString());

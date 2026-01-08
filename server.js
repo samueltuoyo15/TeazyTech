@@ -314,7 +314,7 @@ app.post("/api/admin/login", endpointLimiter, async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: 3600 * 1000,
       path: "/",
-      sameSite: "strict",
+      sameSite: "lax",
       partitioned: true,
     });
     return res.json({
@@ -500,20 +500,20 @@ app.get("/api/admin/posts", async (req, res, next) => {
 
       const timeAgo = publishedDate
         ? (() => {
-            const secondsAgo = Math.floor(
-              (Date.now() - publishedDate.getTime()) / 1000,
-            );
-            const { value, unit } = getTimeUnit(secondsAgo);
-            return rtf.format(-value, unit);
-          })()
+          const secondsAgo = Math.floor(
+            (Date.now() - publishedDate.getTime()) / 1000,
+          );
+          const { value, unit } = getTimeUnit(secondsAgo);
+          return rtf.format(-value, unit);
+        })()
         : "Unknown time";
 
       const formattedDate = publishedDate
         ? new Intl.DateTimeFormat("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          }).format(publishedDate)
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(publishedDate)
         : null;
 
       return {
@@ -595,20 +595,20 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
 
       const timeAgo = publishedDate
         ? (() => {
-            const secondsAgo = Math.floor(
-              (Date.now() - publishedDate.getTime()) / 1000,
-            );
-            const { value, unit } = getTimeUnit(secondsAgo);
-            return rtf.format(-value, unit);
-          })()
+          const secondsAgo = Math.floor(
+            (Date.now() - publishedDate.getTime()) / 1000,
+          );
+          const { value, unit } = getTimeUnit(secondsAgo);
+          return rtf.format(-value, unit);
+        })()
         : "Unknown time";
 
       const formattedDate = publishedDate
         ? new Intl.DateTimeFormat("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          }).format(publishedDate)
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(publishedDate)
         : null;
 
       return {

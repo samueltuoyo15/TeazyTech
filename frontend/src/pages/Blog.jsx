@@ -126,7 +126,14 @@ const Blog = () => {
                 filteredPosts.map((post) => (
                   <div key={post.id} className="blog-post-card">
                     <div className="blog-post-image">
-                      <img src={post.thumbnail} alt={post.title} />
+                      <img
+                        src={post.thumbnail || "/default-blog-thumbnail.png"}
+                        alt={post.title}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/default-blog-thumbnail.png";
+                        }}
+                      />
                       <div className="blog-post-category">{post.category}</div>
                     </div>
                     <div className="blog-post-content">
@@ -262,7 +269,14 @@ const Blog = () => {
                     {recentPosts.map((post) => (
                       <div key={post.id} className="recent-post">
                         <div className="recent-post-image">
-                          <img src={post.thumbnail} alt={post.title} />
+                          <img
+                            src={post.thumbnail || "/default-blog-thumbnail.png"}
+                            alt={post.title}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/default-blog-thumbnail.png";
+                            }}
+                          />
                         </div>
                         <div className="recent-post-content">
                           <h4>
